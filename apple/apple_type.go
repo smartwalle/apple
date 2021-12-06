@@ -17,7 +17,8 @@ const (
 )
 
 type Param struct {
-	Receipt string `json:"receipt-data"`
+	Receipt  string `json:"receipt-data"`
+	Password string `json:"password,omitempty"`
 }
 
 type Trade struct {

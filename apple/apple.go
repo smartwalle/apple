@@ -31,8 +31,13 @@ func New() *Client {
 // 首先请求苹果的服务器，获取票据(receipt)的详细信息，然后验证交易信息(transactionId)是否属于该票据，
 // 如果交易信息在票据中，则返回详细的交易信息。
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func (this *Client) VerifyReceipt(transactionId, receipt string) (*Trade, *InApp, error) {
-	var trade, err = this.GetReceipt(receipt)
+func (this *Client) VerifyReceipt(transactionId, receipt string, opts ...Option) (*Trade, *InApp, error) {
+	var nOpt = NewOption()
+	for _, opt := range opts {
+		opt(nOpt)
+	}
+
+	var trade, err = this.GetReceipt(receipt, nOpt)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -60,16 +65,16 @@ func (this *Client) VerifyReceipt(transactionId, receipt string) (*Trade, *InApp
 
 // GetReceipt 获取票据信息
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func (this *Client) GetReceipt(receipt string) (*Trade, error) {
+func (this *Client) GetReceipt(receipt string, opt *option) (*Trade, error) {
 	// 从生产环境查询
-	var trade, err = this.request(kProductionURL, receipt)
+	var trade, err = this.request(kProductionURL, receipt, opt)
 	if err != nil {
 		return nil, err
 	}
 
 	// 如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询
 	if trade != nil && trade.Status == 21007 {
-		trade, err = this.request(kSandboxURL, receipt)
+		trade, err = this.request(kSandboxURL, receipt, opt)
 		if err != nil {
 			return nil, err
 		}
@@ -77,9 +82,10 @@ func (this *Client) GetReceipt(receipt string) (*Trade, error) {
 	return trade, nil
 }
 
-func (this *Client) request(url string, receipt string) (*Trade, error) {
+func (this *Client) request(url string, receipt string, opt *option) (*Trade, error) {
 	var p = &Param{}
 	p.Receipt = receipt
+	p.Password = opt.password
 
 	var data, err = json.Marshal(p)
 	if err != nil {
