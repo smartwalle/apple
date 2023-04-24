@@ -63,7 +63,9 @@ func (this *Client) AccessToken() string {
 
 func (this *Client) request(method, url string, param Param, result interface{}) (err error) {
 	var req = ngx.NewRequest(method, url)
-	req.SetParams(param.Values())
+	if param != nil {
+		req.SetParams(param.Values())
+	}
 	req.SetHeader("Authorization", this.AccessToken())
 
 	rsp, err := req.Do(context.Background())

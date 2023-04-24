@@ -9,13 +9,6 @@ package apple
 // 21007 收据信息是测试用（sandbox），但却被发送到产品环境中验证
 // 21008 收据信息是产品环境中使用，但却被发送到测试环境中验证
 
-type Environment string
-
-const (
-	EnvironmentSandbox    Environment = "Sandbox"
-	EnvironmentProduction Environment = "Production"
-)
-
 type GetReceiptParam struct {
 	Receipt  string `json:"receipt-data"`
 	Password string `json:"password,omitempty"`
