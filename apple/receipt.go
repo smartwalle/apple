@@ -21,8 +21,8 @@ var (
 // 首先请求苹果的服务器，获取票据(receipt)的详细信息，然后验证交易信息(transactionId)是否属于该票据，
 // 如果交易信息在票据中，则返回详细的交易信息。
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func (this *Client) VerifyReceipt(transactionId, receipt string, password string) (*ReceiptSummary, *InApp, error) {
-	var summary, err = this.GetReceipt(receipt, password)
+func VerifyReceipt(transactionId, receipt string, password string) (*ReceiptSummary, *InApp, error) {
+	var summary, err = GetReceipt(receipt, password)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,16 +50,16 @@ func (this *Client) VerifyReceipt(transactionId, receipt string, password string
 
 // GetReceipt 获取票据信息
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func (this *Client) GetReceipt(receipt string, password string) (*ReceiptSummary, error) {
+func GetReceipt(receipt string, password string) (*ReceiptSummary, error) {
 	// 从生产环境查询
-	var summary, err = this.getReceipt(kVerifyReceiptProductionURL, receipt, password)
+	var summary, err = getReceipt(kVerifyReceiptProductionURL, receipt, password)
 	if err != nil {
 		return nil, err
 	}
 
 	// 如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询
 	if summary != nil && summary.Status == 21007 {
-		summary, err = this.getReceipt(kVerifyReceiptSandboxURL, receipt, password)
+		summary, err = getReceipt(kVerifyReceiptSandboxURL, receipt, password)
 		if err != nil {
 			return nil, err
 		}
@@ -67,7 +67,7 @@ func (this *Client) GetReceipt(receipt string, password string) (*ReceiptSummary
 	return summary, nil
 }
 
-func (this *Client) getReceipt(url string, receipt string, password string) (*ReceiptSummary, error) {
+func getReceipt(url string, receipt string, password string) (*ReceiptSummary, error) {
 	var param = &GetReceiptParam{}
 	param.Receipt = receipt
 	param.Password = password
@@ -82,7 +82,7 @@ func (this *Client) getReceipt(url string, receipt string, password string) (*Re
 		return nil, err
 	}
 
-	rsp, err := this.client.Do(req)
+	rsp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
