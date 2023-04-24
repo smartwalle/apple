@@ -3,7 +3,7 @@ package apple
 import "net/http"
 
 const (
-	kRefundLookup = "/v1/refund/lookup/"
+	kRefundLookup = "/v2/refund/lookup/"
 )
 
 // RefundLookup https://developer.apple.com/documentation/appstoreserverapi/get_refund_history
