@@ -16,8 +16,10 @@ func (this *Client) RequestTestNotification() (result *TestNotificationRsp, err 
 	return result, err
 }
 
-// UnmarshalNotification https://developer.apple.com/documentation/appstoreservernotifications/responsebodyv2
-// 用于解析通知数据
+// UnmarshalNotification 用于解析通知数据 https://developer.apple.com/documentation/appstoreservernotifications/responsebodyv2
+//
+// 关于接收到苹果服务器推送的通知之后，业务服务器如何响应参照：
+// https://developer.apple.com/documentation/appstoreservernotifications/responding_to_app_store_server_notifications
 func (this *Client) UnmarshalNotification(data []byte) (*Notification, error) {
 	return UnmarshalNotification(data)
 }
