@@ -19,3 +19,18 @@ type LastTransactionsItem struct {
 	SignedRenewalInfo     SignedRenewal     `json:"signedRenewalInfo"`
 	SignedTransactionInfo SignedTransaction `json:"signedTransactionInfo"`
 }
+
+// ExtendRenewalDateParam https://developer.apple.com/documentation/appstoreserverapi/extendrenewaldaterequest
+type ExtendRenewalDateParam struct {
+	ExtendByDays      int    `json:"extendByDays"`
+	ExtendReasonCode  int    `json:"extendReasonCode"`
+	RequestIdentifier string `json:"requestIdentifier"`
+}
+
+// ExtendRenewalDateRsp https://developer.apple.com/documentation/appstoreserverapi/extendrenewaldateresponse
+type ExtendRenewalDateRsp struct {
+	EffectiveDate         int64  `json:"effectiveDate"`
+	OriginalTransactionId string `json:"originalTransactionId"`
+	Success               bool   `json:"success"`
+	WebOrderLineItemId    string `json:"webOrderLineItemId"`
+}

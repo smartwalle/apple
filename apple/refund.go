@@ -8,6 +8,6 @@ const (
 
 // RefundLookup https://developer.apple.com/documentation/appstoreserverapi/get_refund_history
 func (this *Client) RefundLookup(transactionId string, param RefundLookupParam) (result *RefundLookupRsp, err error) {
-	err = this.request(http.MethodGet, this.BuildAPI(kRefundLookup, transactionId), param, &result)
+	err = this.request(http.MethodGet, this.BuildAPI(kRefundLookup, transactionId), param, nil, &result)
 	return result, err
 }

@@ -61,10 +61,14 @@ func (this *Client) AccessToken() string {
 	return this.token.AccessToken()
 }
 
-func (this *Client) request(method, url string, param Param, result interface{}) (err error) {
+func (this *Client) request(method, url string, param Param, body ngx.Body, result interface{}) (err error) {
 	var req = ngx.NewRequest(method, url)
 	if param != nil {
 		req.SetParams(param.Values())
+	}
+	if body != nil {
+		req.SetBody(body)
+		req.SetContentType(ngx.ContentTypeJSON)
 	}
 	req.SetHeader("Authorization", this.AccessToken())
 
