@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	kProductionURL = "https://buy.itunes.apple.com/verifyReceipt"
-	kSandboxURL    = "https://sandbox.itunes.apple.com/verifyReceipt"
+	kVerifyReceiptProductionURL = "https://buy.itunes.apple.com/verifyReceipt"
+	kVerifyReceiptSandboxURL    = "https://sandbox.itunes.apple.com/verifyReceipt"
 )
 
 var (
@@ -34,7 +34,9 @@ func New() *Client {
 func (this *Client) VerifyReceipt(transactionId, receipt string, opts ...Option) (*Trade, *InApp, error) {
 	var nOpt = NewOption()
 	for _, opt := range opts {
-		opt(nOpt)
+		if opt != nil {
+			opt(nOpt)
+		}
 	}
 
 	var trade, err = this.GetReceipt(receipt, nOpt)
@@ -65,16 +67,16 @@ func (this *Client) VerifyReceipt(transactionId, receipt string, opts ...Option)
 
 // GetReceipt 获取票据信息
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func (this *Client) GetReceipt(receipt string, opt *option) (*Trade, error) {
+func (this *Client) GetReceipt(receipt string, opts *options) (*Trade, error) {
 	// 从生产环境查询
-	var trade, err = this.request(kProductionURL, receipt, opt)
+	var trade, err = this.request(kVerifyReceiptProductionURL, receipt, opts)
 	if err != nil {
 		return nil, err
 	}
 
 	// 如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询
 	if trade != nil && trade.Status == 21007 {
-		trade, err = this.request(kSandboxURL, receipt, opt)
+		trade, err = this.request(kVerifyReceiptSandboxURL, receipt, opts)
 		if err != nil {
 			return nil, err
 		}
@@ -82,33 +84,28 @@ func (this *Client) GetReceipt(receipt string, opt *option) (*Trade, error) {
 	return trade, nil
 }
 
-func (this *Client) request(url string, receipt string, opt *option) (*Trade, error) {
+func (this *Client) request(url string, receipt string, opts *options) (*Trade, error) {
 	var p = &Param{}
 	p.Receipt = receipt
-	p.Password = opt.password
+	p.Password = opts.password
 
 	var data, err = json.Marshal(p)
 	if err != nil {
 		return nil, err
 	}
 
-	var body = bytes.NewReader(data)
-
-	req, err := http.NewRequest(http.MethodPost, url, body)
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
 
 	rsp, err := this.client.Do(req)
-	if rsp != nil && rsp.Body != nil {
-		defer rsp.Body.Close()
-	}
 	if err != nil {
 		return nil, err
 	}
+	defer rsp.Body.Close()
 
 	var trade *Trade
-
 	var decoder = json.NewDecoder(rsp.Body)
 	if err = decoder.Decode(&trade); err != nil {
 		return nil, err

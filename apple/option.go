@@ -1,17 +1,17 @@
 package apple
 
-type option struct {
+type options struct {
 	password string
 }
 
-func NewOption() *option {
-	return &option{}
+func NewOption() *options {
+	return &options{}
 }
 
-type Option func(opt *option)
+type Option func(opt *options)
 
 func WithPassword(password string) Option {
-	return func(opt *option) {
+	return func(opt *options) {
 		opt.password = password
 	}
 }

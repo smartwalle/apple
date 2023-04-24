@@ -12,8 +12,8 @@ package apple
 type Environment string
 
 const (
-	EnvironmentSandbox    = "Sandbox"
-	EnvironmentProduction = "Production"
+	EnvironmentSandbox    Environment = "Sandbox"
+	EnvironmentProduction Environment = "Production"
 )
 
 type Param struct {
