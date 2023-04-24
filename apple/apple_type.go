@@ -40,9 +40,12 @@ func (s SignedTransaction) Decode() (*Transaction, error) {
 	return item, nil
 }
 
-// Transaction https://developer.apple.com/documentation/appstoreserverapi/jwstransactiondecodedpayload
+// Transaction
+// https://developer.apple.com/documentation/appstoreserverapi/jwstransactiondecodedpayload
+// https://developer.apple.com/documentation/appstoreservernotifications/jwstransactiondecodedpayload
 type Transaction struct {
 	jwt.RegisteredClaims
+	AppAccountToken             string      `json:"appAccountToken"`
 	TransactionId               string      `json:"transactionId"`
 	OriginalTransactionId       string      `json:"originalTransactionId"`
 	WebOrderLineItemId          string      `json:"webOrderLineItemId"`
@@ -56,10 +59,12 @@ type Transaction struct {
 	Type                        string      `json:"type"`
 	InAppOwnershipType          string      `json:"inAppOwnershipType"`
 	SignedDate                  int64       `json:"signedDate"`
+	OfferIdentifier             string      `json:"offerIdentifier"`
 	OfferType                   int         `json:"offerType"`
 	Environment                 Environment `json:"environment"`
 	RevocationReason            int         `json:"revocationReason"`
 	RevocationDate              int64       `json:"revocationDate"`
+	IsUpgraded                  bool        `json:"isUpgraded"`
 }
 
 type SignedRenewal string
@@ -75,7 +80,9 @@ func (s SignedRenewal) Decode() (*RenewalInfo, error) {
 	return item, nil
 }
 
-// RenewalInfo https://developer.apple.com/documentation/appstoreserverapi/jwsrenewalinfodecodedpayload
+// RenewalInfo
+// https://developer.apple.com/documentation/appstoreserverapi/jwsrenewalinfodecodedpayload
+// https://developer.apple.com/documentation/appstoreservernotifications/jwsrenewalinfodecodedpayload
 type RenewalInfo struct {
 	jwt.RegisteredClaims
 	AutoRenewProductId          string      `json:"autoRenewProductId"`
