@@ -69,21 +69,21 @@ type Transaction struct {
 
 type SignedRenewal string
 
-func (s SignedRenewal) Decode() (*RenewalInfo, error) {
+func (s SignedRenewal) Decode() (*Renewal, error) {
 	if s == "" {
 		return nil, nil
 	}
-	var item = &RenewalInfo{}
+	var item = &Renewal{}
 	if err := internal.DecodeClaims(string(s), item); err != nil {
 		return nil, err
 	}
 	return item, nil
 }
 
-// RenewalInfo
+// Renewal
 // https://developer.apple.com/documentation/appstoreserverapi/jwsrenewalinfodecodedpayload
 // https://developer.apple.com/documentation/appstoreservernotifications/jwsrenewalinfodecodedpayload
-type RenewalInfo struct {
+type Renewal struct {
 	jwt.RegisteredClaims
 	AutoRenewProductId          string      `json:"autoRenewProductId"`
 	AutoRenewStatus             int         `json:"autoRenewStatus"`
