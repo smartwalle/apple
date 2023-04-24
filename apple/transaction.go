@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	kTransactionHistory = "/history/"
+	kTransactionHistory = "/history/v1"
 )
 
 // GetTransactionHistory https://developer.apple.com/documentation/appstoreserverapi/get_transaction_history

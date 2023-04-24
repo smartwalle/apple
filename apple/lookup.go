@@ -3,7 +3,7 @@ package apple
 import "net/http"
 
 const (
-	kOrderLookup = "/lookup/"
+	kOrderLookup = "/lookup/v1"
 )
 
 // OrderLookup https://developer.apple.com/documentation/appstoreserverapi/look_up_order_id

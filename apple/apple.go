@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	kStoreKitSandboxURL    = "https://api.storekit-sandbox.itunes.apple.com/inApps/v1"
-	kStoreKitProductionURL = "https://api.storekit.itunes.apple.com/inApps/v1"
+	kStoreKitSandboxURL    = "https://api.storekit-sandbox.itunes.apple.com/inApps"
+	kStoreKitProductionURL = "https://api.storekit.itunes.apple.com/inApps"
 )
 
 type Client struct {
