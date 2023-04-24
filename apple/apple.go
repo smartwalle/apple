@@ -61,10 +61,12 @@ func (this *Client) AccessToken() string {
 	return this.token.AccessToken()
 }
 
-func (this *Client) request(req *ngx.Request, result interface{}) (err error) {
+func (this *Client) request(method, url string, param Param, result interface{}) (err error) {
+	var req = ngx.NewRequest(method, url)
+	req.SetParams(param.Values())
 	req.SetHeader("Authorization", this.AccessToken())
-	rsp, err := req.Do(context.Background())
 
+	rsp, err := req.Do(context.Background())
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,13 @@
 package apple
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
+
+type Param interface {
+	Values() url.Values
+}
 
 type ResponseError struct {
 	Code    int    `json:"errorCode"`
