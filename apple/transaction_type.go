@@ -57,3 +57,22 @@ type TransactionHistoryRsp struct {
 	Revision           string              `json:"revision"`
 	SignedTransactions []SignedTransaction `json:"signedTransactions"`
 }
+
+// ConsumptionParam https://developer.apple.com/documentation/appstoreserverapi/consumptionrequest
+type ConsumptionParam struct {
+	AccountTenure            int    `json:"accountTenure"`
+	AppAccountToken          string `json:"appAccountToken"`
+	ConsumptionStatus        int    `json:"consumptionStatus"`
+	CustomerConsented        bool   `json:"customerConsented"`
+	DeliveryStatus           int    `json:"deliveryStatus"`
+	LifetimeDollarsPurchased int    `json:"lifetimeDollarsPurchased"`
+	LifetimeDollarsRefunded  int    `json:"lifetimeDollarsRefunded"`
+	Platform                 int    `json:"platform"`
+	PlayTime                 int    `json:"playTime"`
+	SampleContentProvided    bool   `json:"sampleContentProvided"`
+	UserStatus               int    `json:"userStatus"`
+}
+
+// ConsumptionRsp https://developer.apple.com/documentation/appstoreserverapi/historyresponse
+type ConsumptionRsp struct {
+}
