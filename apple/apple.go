@@ -1,15 +1,93 @@
 package apple
 
 import (
+	"context"
+	"encoding/json"
+	"github.com/smartwalle/inpay/apple/internal"
+	"github.com/smartwalle/ngx"
+	"io"
 	"net/http"
+	"strings"
+)
+
+const (
+	kStoreKitSandboxURL    = "https://api.storekit-sandbox.itunes.apple.com/inApps/v1"
+	kStoreKitProductionURL = "https://api.storekit.itunes.apple.com/inApps/v1"
 )
 
 type Client struct {
-	client *http.Client
+	token     *internal.Token
+	apiDomain string
 }
 
-func New() *Client {
-	var c = &Client{}
-	c.client = http.DefaultClient
-	return c
+func New(keyfile, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
+	var pKey, err = internal.LoadKeyFromFile(keyfile)
+	if err != nil {
+		return nil, err
+	}
+
+	var nClient = &Client{}
+	nClient.token = internal.NewToken(pKey, keyId, issuer, bundleId)
+
+	if isProduction {
+		nClient.apiDomain = kStoreKitProductionURL
+	} else {
+		nClient.apiDomain = kStoreKitSandboxURL
+	}
+
+	return nClient, nil
+}
+
+func (this *Client) BuildAPI(paths ...string) string {
+	var path = this.apiDomain
+	for _, p := range paths {
+		p = strings.TrimSpace(p)
+		if len(p) > 0 {
+			if strings.HasSuffix(path, "/") {
+				path = path + p
+			} else {
+				if strings.HasPrefix(p, "/") {
+					path = path + p
+				} else {
+					path = path + "/" + p
+				}
+			}
+		}
+	}
+	return path
+}
+
+func (this *Client) AccessToken() string {
+	return this.token.AccessToken()
+}
+
+func (this *Client) request(req *ngx.Request, result interface{}) (err error) {
+	req.SetHeader("Authorization", this.AccessToken())
+	rsp, err := req.Do(context.Background())
+
+	if err != nil {
+		return err
+	}
+	defer rsp.Body.Close()
+
+	data, err := io.ReadAll(rsp.Body)
+	if err != nil {
+		return err
+	}
+
+	switch rsp.StatusCode {
+	case http.StatusOK:
+		if err = json.Unmarshal(data, &result); err != nil {
+			return err
+		}
+	case http.StatusUnauthorized:
+		return &ResponseError{Code: http.StatusUnauthorized, Message: "Unauthenticated"}
+	default:
+		var rErr *ResponseError
+		if err = json.Unmarshal(data, &rErr); err != nil {
+			return err
+		}
+		return rErr
+	}
+	return nil
 }
