@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	kTokenTimeout = 1800
+	kTokenTimeout = 3000
 )
 
 type Token struct {
