@@ -2,7 +2,7 @@ package apple
 
 import (
 	"encoding/json"
-	"github.com/smartwalle/inpay/apple/internal"
+	"github.com/smartwalle/apple/internal"
 	"net/http"
 )
 

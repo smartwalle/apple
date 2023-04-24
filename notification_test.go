@@ -1,7 +1,7 @@
 package apple_test
 
 import (
-	"github.com/smartwalle/inpay/apple"
+	"github.com/smartwalle/apple"
 	"testing"
 )
 

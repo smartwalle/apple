@@ -3,7 +3,7 @@ package apple
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/smartwalle/inpay/apple/internal"
+	"github.com/smartwalle/apple/internal"
 	"net/url"
 )
 

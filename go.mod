@@ -1,4 +1,4 @@
-module github.com/smartwalle/inpay
+module github.com/smartwalle/apple
 
 go 1.17
 

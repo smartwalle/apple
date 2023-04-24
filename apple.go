@@ -3,7 +3,7 @@ package apple
 import (
 	"context"
 	"encoding/json"
-	"github.com/smartwalle/inpay/apple/internal"
+	"github.com/smartwalle/apple/internal"
 	"github.com/smartwalle/ngx"
 	"io"
 	"net/http"
