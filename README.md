@@ -27,7 +27,7 @@ PayPal [https://github.com/smartwalle/paypal](https://github.com/smartwalle/payp
 ## 苹果内购验证
 
 ```go
-var receiptSummary, info, err = apple.VerifyReceipt(transactionId, receipt, password)
+var receiptSummary, info, err = apple.VerifyReceipt(transactionId, receipt)
 ```
 
 苹果内购验证支持**生产环境**和**沙箱环境**，**VerifyReceipt()** 函数内部会优先向苹果生产环境进行验证，然后根据获取到的数据判断是否要向沙箱环境进行验证。

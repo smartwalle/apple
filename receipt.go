@@ -17,12 +17,12 @@ var (
 	ErrBadReceipt = errors.New("bad receipt")
 )
 
-// VerifyReceipt 验证苹果内购交易是否有效，
+// VerifyReceipt 验证苹果内购交易是否有效 https://developer.apple.com/documentation/appstorereceipts/verifyreceipt
 // 首先请求苹果的服务器，获取票据(receipt)的详细信息，然后验证交易信息(transactionId)是否属于该票据，
 // 如果交易信息在票据中，则返回详细的交易信息。
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func VerifyReceipt(transactionId, receipt string, password string) (*ReceiptSummary, *InApp, error) {
-	var summary, err = GetReceipt(receipt, password)
+func VerifyReceipt(transactionId, receipt string, opts ...VerifyReceiptOptionFunc) (*ReceiptSummary, *InApp, error) {
+	var summary, err = GetReceipt(receipt, opts...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,16 +50,24 @@ func VerifyReceipt(transactionId, receipt string, password string) (*ReceiptSumm
 
 // GetReceipt 获取票据信息
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func GetReceipt(receipt string, password string) (*ReceiptSummary, error) {
+func GetReceipt(receipt string, opts ...VerifyReceiptOptionFunc) (*ReceiptSummary, error) {
+	var nOpt = &ReceiptOptions{}
+	nOpt.Receipt = receipt
+	for _, opt := range opts {
+		if opt != nil {
+			opt(nOpt)
+		}
+	}
+
 	// 从生产环境查询
-	var summary, err = getReceipt(kVerifyReceiptProductionURL, receipt, password)
+	var summary, err = getReceipt(kVerifyReceiptProductionURL, nOpt)
 	if err != nil {
 		return nil, err
 	}
 
 	// 如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询
 	if summary != nil && summary.Status == 21007 {
-		summary, err = getReceipt(kVerifyReceiptSandboxURL, receipt, password)
+		summary, err = getReceipt(kVerifyReceiptSandboxURL, nOpt)
 		if err != nil {
 			return nil, err
 		}
@@ -67,12 +75,8 @@ func GetReceipt(receipt string, password string) (*ReceiptSummary, error) {
 	return summary, nil
 }
 
-func getReceipt(url string, receipt string, password string) (*ReceiptSummary, error) {
-	var param = &GetReceiptParam{}
-	param.Receipt = receipt
-	param.Password = password
-
-	var data, err = json.Marshal(param)
+func getReceipt(url string, opts *ReceiptOptions) (*ReceiptSummary, error) {
+	var data, err = json.Marshal(opts)
 	if err != nil {
 		return nil, err
 	}
