@@ -60,7 +60,7 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 		return err
 	}
 
-	if err = VerifyCert(rootCert, intermediateCert, leafCert); err != nil {
+	if err = verifyCert(rootCert, intermediateCert, leafCert); err != nil {
 		return err
 	}
 
@@ -77,7 +77,7 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 	return nil
 }
 
-func VerifyCert(rootCert, intermediateCert, leafCert *x509.Certificate) error {
+func verifyCert(rootCert, intermediateCert, leafCert *x509.Certificate) error {
 	var roots = x509.NewCertPool()
 	if !roots.AppendCertsFromPEM([]byte(kRootPEM)) {
 		return errors.New("failed to load root certificate")
