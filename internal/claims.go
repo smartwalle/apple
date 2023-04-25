@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/smartwalle/ncrypto"
 	"strings"
 )
 
@@ -44,56 +45,42 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 		return err
 	}
 
-	rootCert, err := DecodeCert(header.X5C[2])
-	if err != nil {
-		return err
-	}
-	intermediateCert, err := DecodeCert(header.X5C[1])
+	rootCert, err := ncrypto.ParseCertificate(ncrypto.FormatCertificate(header.X5C[2]))
 	if err != nil {
 		return err
 	}
 
-	if err = VerifyCert(rootCert, intermediateCert); err != nil {
+	intermediateCert, err := ncrypto.ParseCertificate(ncrypto.FormatCertificate(header.X5C[1]))
+	if err != nil {
 		return err
 	}
+
+	leafCert, err := ncrypto.ParseCertificate(ncrypto.FormatCertificate(header.X5C[0]))
+	if err != nil {
+		return err
+	}
+
+	if err = VerifyCert(rootCert, intermediateCert, leafCert); err != nil {
+		return err
+	}
+
 	if _, err = jwt.ParseWithClaims(payload, claims, func(token *jwt.Token) (interface{}, error) {
-		return DecodePublicKey(header.X5C[0])
+		switch publicKey := leafCert.PublicKey.(type) {
+		case *ecdsa.PublicKey:
+			return publicKey, nil
+		default:
+			return nil, errors.New("key is not a valid *ecdsa.PublicKey")
+		}
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func DecodePublicKey(payload string) (*ecdsa.PublicKey, error) {
-	cert, err := DecodeCert(payload)
-	if err != nil {
-		return nil, err
-	}
-	switch pk := cert.PublicKey.(type) {
-	case *ecdsa.PublicKey:
-		return pk, nil
-	default:
-		return nil, errors.New("appstore public key must be of type ecdsa.PublicKey")
-	}
-}
-
-func DecodeCert(payload string) (*x509.Certificate, error) {
-	certBytes, err := base64.StdEncoding.DecodeString(payload)
-	if err != nil {
-		return nil, err
-	}
-
-	cert, err := x509.ParseCertificate(certBytes)
-	if err != nil {
-		return nil, err
-	}
-	return cert, nil
-}
-
-func VerifyCert(rootCert, intermediateCert *x509.Certificate) error {
+func VerifyCert(rootCert, intermediateCert, leafCert *x509.Certificate) error {
 	var roots = x509.NewCertPool()
 	if !roots.AppendCertsFromPEM([]byte(kRootPEM)) {
-		return errors.New("failed to parse root certificate")
+		return errors.New("failed to load root certificate")
 	}
 
 	var intermediates = x509.NewCertPool()
@@ -103,6 +90,11 @@ func VerifyCert(rootCert, intermediateCert *x509.Certificate) error {
 		Roots:         roots,
 		Intermediates: intermediates,
 	}
-	_, err := rootCert.Verify(opts)
-	return err
+	if _, err := rootCert.Verify(opts); err != nil {
+		return err
+	}
+	if _, err := leafCert.Verify(opts); err != nil {
+		return err
+	}
+	return nil
 }

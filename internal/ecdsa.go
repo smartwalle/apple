@@ -8,15 +8,15 @@ import (
 	"os"
 )
 
-func LoadKeyFromFile(filename string) (*ecdsa.PrivateKey, error) {
+func DecodePrivateKeyFromFile(filename string) (*ecdsa.PrivateKey, error) {
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	return LoadKeyFromBytes(bytes)
+	return DecodePrivateKey(bytes)
 }
 
-func LoadKeyFromBytes(bytes []byte) (*ecdsa.PrivateKey, error) {
+func DecodePrivateKey(bytes []byte) (*ecdsa.PrivateKey, error) {
 	block, _ := pem.Decode(bytes)
 	if block == nil {
 		return nil, errors.New("must be a valid .p8 PEM file")
@@ -27,7 +27,7 @@ func LoadKeyFromBytes(bytes []byte) (*ecdsa.PrivateKey, error) {
 	}
 	key, ok := rawKey.(*ecdsa.PrivateKey)
 	if !ok {
-		return nil, errors.New("must be of type ecdsa.PrivateKey")
+		return nil, errors.New("key is not a valid *ecdsa.PrivateKey")
 	}
 	return key, nil
 }

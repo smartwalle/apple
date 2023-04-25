@@ -21,7 +21,7 @@ type Client struct {
 }
 
 func New(keyfile, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
-	var pKey, err = internal.LoadKeyFromFile(keyfile)
+	var pKey, err = internal.DecodePrivateKeyFromFile(keyfile)
 	if err != nil {
 		return nil, err
 	}
