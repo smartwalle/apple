@@ -34,14 +34,13 @@ type Header struct {
 }
 
 func DecodeClaims(payload string, claims jwt.Claims) error {
-	data, err := base64.RawStdEncoding.DecodeString(strings.Split(payload, ".")[0])
+	headerBytes, err := base64.RawStdEncoding.DecodeString(strings.Split(payload, ".")[0])
 	if err != nil {
 		return err
 	}
 
 	var header *Header
-	err = json.Unmarshal(data, &header)
-	if err != nil {
+	if err = json.Unmarshal(headerBytes, &header); err != nil {
 		return err
 	}
 
