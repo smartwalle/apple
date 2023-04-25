@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"strings"
 )
@@ -29,20 +28,37 @@ at+qIxUCMG1mihDK1A3UT82NQz60imOlM27jbdoXt2QfyFMm+YhidDkLF1vLUagM
 -----END CERTIFICATE-----
 `
 
+type Header struct {
+	Alg string   `json:"alg"`
+	X5C []string `json:"x5c"`
+}
+
 func DecodeClaims(payload string, claims jwt.Claims) error {
-	rootCert, err := DecodeCert(payload, 2)
+	data, err := base64.RawStdEncoding.DecodeString(strings.Split(payload, ".")[0])
 	if err != nil {
 		return err
 	}
-	intermediateCert, err := DecodeCert(payload, 1)
+
+	var header *Header
+	err = json.Unmarshal(data, &header)
 	if err != nil {
 		return err
 	}
+
+	rootCert, err := DecodeCert(header.X5C[2])
+	if err != nil {
+		return err
+	}
+	intermediateCert, err := DecodeCert(header.X5C[1])
+	if err != nil {
+		return err
+	}
+
 	if err = VerifyCert(rootCert, intermediateCert); err != nil {
 		return err
 	}
 	if _, err = jwt.ParseWithClaims(payload, claims, func(token *jwt.Token) (interface{}, error) {
-		return DecodePublicKey(payload)
+		return DecodePublicKey(header.X5C[0])
 	}); err != nil {
 		return err
 	}
@@ -50,7 +66,7 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 }
 
 func DecodePublicKey(payload string) (*ecdsa.PublicKey, error) {
-	cert, err := DecodeCert(payload, 0)
+	cert, err := DecodeCert(payload)
 	if err != nil {
 		return nil, err
 	}
@@ -62,31 +78,8 @@ func DecodePublicKey(payload string) (*ecdsa.PublicKey, error) {
 	}
 }
 
-type Header struct {
-	Alg string   `json:"alg"`
-	X5C []string `json:"x5c"`
-}
-
-func DecodeCert(payload string, index int) (*x509.Certificate, error) {
-	if index > 2 {
-		return nil, errors.New("invalid index")
-	}
-	data, err := base64.RawStdEncoding.DecodeString(strings.Split(payload, ".")[0])
-	if err != nil {
-		return nil, err
-	}
-
-	var header *Header
-	err = json.Unmarshal(data, &header)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(header.X5C) < index {
-		return nil, fmt.Errorf("invalid index")
-	}
-
-	certBytes, err := base64.StdEncoding.DecodeString(header.X5C[index])
+func DecodeCert(payload string) (*x509.Certificate, error) {
+	certBytes, err := base64.StdEncoding.DecodeString(payload)
 	if err != nil {
 		return nil, err
 	}
