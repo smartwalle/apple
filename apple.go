@@ -16,6 +16,7 @@ const (
 )
 
 type Client struct {
+	Client    *http.Client
 	token     *internal.Token
 	apiDomain string
 }
@@ -27,6 +28,7 @@ func New(keyfile, keyId, issuer, bundleId string, isProduction bool) (*Client, e
 	}
 
 	var nClient = &Client{}
+	nClient.Client = http.DefaultClient
 	nClient.token = internal.NewToken(pKey, keyId, issuer, bundleId)
 
 	if isProduction {
@@ -62,7 +64,7 @@ func (this *Client) AccessToken() string {
 }
 
 func (this *Client) request(method, url string, param Param, body ngx.Body, result interface{}) (err error) {
-	var req = ngx.NewRequest(method, url)
+	var req = ngx.NewRequest(method, url, ngx.WithClient(this.Client))
 	if param != nil {
 		req.SetParams(param.Values())
 	}
