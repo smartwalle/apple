@@ -60,10 +60,6 @@ func (this *Client) BuildAPI(paths ...string) string {
 	return path
 }
 
-func (this *Client) AccessToken() string {
-	return this.token.AccessToken()
-}
-
 func (this *Client) request(method, url string, param Param, body ngx.Body, result interface{}) (err error) {
 	var req = ngx.NewRequest(method, url, ngx.WithClient(this.Client))
 	if param != nil {
@@ -73,7 +69,7 @@ func (this *Client) request(method, url string, param Param, body ngx.Body, resu
 		req.SetBody(body)
 		req.SetContentType(ngx.ContentTypeJSON)
 	}
-	req.SetHeader("Authorization", this.AccessToken())
+	req.SetHeader("Authorization", this.token.Bearer())
 
 	rsp, err := req.Do(context.Background())
 	if err != nil {

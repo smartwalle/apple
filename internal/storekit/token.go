@@ -16,8 +16,7 @@ const (
 type Token struct {
 	sync.Mutex
 
-	accessToken string
-
+	bearer     string
 	issuedAt   int64
 	keyId      string
 	issuer     string
@@ -54,14 +53,14 @@ func (this *Token) generate() (string, int64, error) {
 	return fmt.Sprintf("Bearer %s", bearer), issuedAt, nil
 }
 
-func (this *Token) AccessToken() string {
+func (this *Token) Bearer() string {
 	this.Lock()
 	defer this.Unlock()
 
 	if this.expired() {
-		this.accessToken, this.issuedAt, _ = this.generate()
+		this.bearer, this.issuedAt, _ = this.generate()
 	}
-	return this.accessToken
+	return this.bearer
 }
 
 func (this *Token) expired() bool {
