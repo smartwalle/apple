@@ -24,12 +24,11 @@ func (this *Client) DecodeNotification(data []byte) (*Notification, error) {
 	return DecodeNotification(data)
 }
 
-type NotificationPayload struct {
-	SignedPayload string `json:"signedPayload"`
-}
-
 func DecodeNotification(data []byte) (*Notification, error) {
-	var payload *NotificationPayload
+	var payload = &struct {
+		SignedPayload string `json:"signedPayload"`
+	}{}
+
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return nil, err
 	}
