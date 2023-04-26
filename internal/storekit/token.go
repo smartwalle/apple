@@ -1,4 +1,4 @@
-package internal
+package storekit
 
 import (
 	"crypto/ecdsa"

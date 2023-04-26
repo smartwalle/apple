@@ -2,7 +2,7 @@ package apple
 
 import (
 	"encoding/json"
-	"github.com/smartwalle/apple/internal"
+	"github.com/smartwalle/apple/internal/storekit"
 	"net/http"
 )
 
@@ -35,7 +35,7 @@ func DecodeNotification(data []byte) (*Notification, error) {
 	}
 
 	var notification = &Notification{}
-	if err := internal.DecodeClaims(payload.SignedPayload, notification); err != nil {
+	if err := storekit.DecodeClaims(payload.SignedPayload, notification); err != nil {
 		return nil, err
 	}
 	return notification, nil

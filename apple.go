@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/smartwalle/apple/internal"
+	"github.com/smartwalle/apple/internal/storekit"
 	"github.com/smartwalle/ngx"
 	"io"
 	"net/http"
@@ -11,13 +12,13 @@ import (
 )
 
 const (
-	kStoreKitSandboxURL    = "https://api.storekit-sandbox.itunes.apple.com/inApps"
-	kStoreKitProductionURL = "https://api.storekit.itunes.apple.com/inApps"
+	kStoreKitSandbox    = "https://api.storekit-sandbox.itunes.apple.com/inApps"
+	kStoreKitProduction = "https://api.storekit.itunes.apple.com/inApps"
 )
 
 type Client struct {
 	Client    *http.Client
-	token     *internal.Token
+	token     *storekit.Token
 	apiDomain string
 }
 
@@ -29,12 +30,12 @@ func New(keyfile, keyId, issuer, bundleId string, isProduction bool) (*Client, e
 
 	var nClient = &Client{}
 	nClient.Client = http.DefaultClient
-	nClient.token = internal.NewToken(pKey, keyId, issuer, bundleId)
+	nClient.token = storekit.NewToken(pKey, keyId, issuer, bundleId)
 
 	if isProduction {
-		nClient.apiDomain = kStoreKitProductionURL
+		nClient.apiDomain = kStoreKitProduction
 	} else {
-		nClient.apiDomain = kStoreKitSandboxURL
+		nClient.apiDomain = kStoreKitSandbox
 	}
 
 	return nClient, nil

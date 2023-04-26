@@ -3,7 +3,7 @@ package apple
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/smartwalle/apple/internal"
+	"github.com/smartwalle/apple/internal/storekit"
 	"net/url"
 )
 
@@ -34,7 +34,7 @@ func (s SignedTransaction) Decode() (*Transaction, error) {
 		return nil, nil
 	}
 	var item = &Transaction{}
-	if err := internal.DecodeClaims(string(s), item); err != nil {
+	if err := storekit.DecodeClaims(string(s), item); err != nil {
 		return nil, err
 	}
 	return item, nil
@@ -98,7 +98,7 @@ func (s SignedRenewal) Decode() (*Renewal, error) {
 		return nil, nil
 	}
 	var item = &Renewal{}
-	if err := internal.DecodeClaims(string(s), item); err != nil {
+	if err := storekit.DecodeClaims(string(s), item); err != nil {
 		return nil, err
 	}
 	return item, nil

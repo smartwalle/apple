@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	kFetchAuthKeysURL = "https://appleid.apple.com/auth/keys"
+	kFetchAuthKeys = "https://appleid.apple.com/auth/keys"
 )
 
 type IdentityClient struct {
@@ -71,7 +71,7 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 		return key
 	}
 
-	this.group.Do(kFetchAuthKeysURL, func(_ string) (interface{}, error) {
+	this.group.Do(kFetchAuthKeys, func(_ string) (interface{}, error) {
 		// 从苹果服务器请求 key 数据
 		var nKeys, _ = this.requestAuthKeys()
 
@@ -88,7 +88,7 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 
 // requestAuthKeys https://developer.apple.com/documentation/sign_in_with_apple/fetch_apple_s_public_key_for_verifying_token_signature
 func (this *IdentityClient) requestAuthKeys() (map[string]*rsa.PublicKey, error) {
-	var req = ngx.NewRequest(http.MethodGet, kFetchAuthKeysURL, ngx.WithClient(this.Client))
+	var req = ngx.NewRequest(http.MethodGet, kFetchAuthKeys, ngx.WithClient(this.Client))
 
 	var rsp, err = req.Do(context.Background())
 	if err != nil {
