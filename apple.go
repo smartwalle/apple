@@ -22,8 +22,8 @@ type Client struct {
 	apiDomain string
 }
 
-func New(keyfile, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
-	var pKey, err = internal.DecodePrivateKeyFromFile(keyfile)
+func New(p8file, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
+	var pKey, err = internal.DecodePrivateKeyFromFile(p8file)
 	if err != nil {
 		return nil, err
 	}
