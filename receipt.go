@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	kVerifyReceiptProductionURL = "https://buy.itunes.apple.com/verifyReceipt"
-	kVerifyReceiptSandboxURL    = "https://sandbox.itunes.apple.com/verifyReceipt"
+	kVerifyReceiptProduction = "https://buy.itunes.apple.com/verifyReceipt"
+	kVerifyReceiptSandbox    = "https://sandbox.itunes.apple.com/verifyReceipt"
 )
 
 var (
@@ -60,14 +60,14 @@ func GetReceipt(receipt string, opts ...VerifyReceiptOptionFunc) (*ReceiptSummar
 	}
 
 	// 从生产环境查询
-	var summary, err = getReceipt(kVerifyReceiptProductionURL, nOpt)
+	var summary, err = getReceipt(kVerifyReceiptProduction, nOpt)
 	if err != nil {
 		return nil, err
 	}
 
 	// 如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询
 	if summary != nil && summary.Status == 21007 {
-		summary, err = getReceipt(kVerifyReceiptSandboxURL, nOpt)
+		summary, err = getReceipt(kVerifyReceiptSandbox, nOpt)
 		if err != nil {
 			return nil, err
 		}
