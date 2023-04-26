@@ -1,9 +1,12 @@
 package apple
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"encoding/json"
+	"github.com/golang-jwt/jwt/v5"
+)
 
-// TestNotificationRsp https://developer.apple.com/documentation/appstoreserverapi/sendtestnotificationresponse
-type TestNotificationRsp struct {
+// TestNotificationResponse https://developer.apple.com/documentation/appstoreserverapi/sendtestnotificationresponse
+type TestNotificationResponse struct {
 	TestNotificationToken string `json:"testNotificationToken"`
 }
 
@@ -62,12 +65,36 @@ type Notification struct {
 }
 
 type NotificationData struct {
-	AppAppleId         int64             `json:"appAppleId"`
-	BundleId           string            `json:"bundleId"`
-	BundleVersion      string            `json:"bundleVersion"`
-	Environment        Environment       `json:"environment"`
-	SignedRenewalInfo  SignedRenewal     `json:"signedRenewalInfo"`
-	SignedTransactions SignedTransaction `json:"signedTransactionInfo"`
+	AppAppleId    int64        `json:"appAppleId"`
+	BundleId      string       `json:"bundleId"`
+	BundleVersion string       `json:"bundleVersion"`
+	Environment   Environment  `json:"environment"`
+	Renewal       *Renewal     `json:"renewal"`
+	Transaction   *Transaction `json:"transaction"`
+}
+
+type NotificationDataAlias NotificationData
+
+func (this *NotificationData) UnmarshalJSON(data []byte) (err error) {
+	var aux = &struct {
+		*NotificationDataAlias
+		SignedRenewal     SignedRenewal     `json:"signedRenewalInfo"`
+		SignedTransaction SignedTransaction `json:"signedTransactionInfo"`
+	}{
+		NotificationDataAlias: (*NotificationDataAlias)(this),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	if this.Renewal, err = aux.SignedRenewal.Decode(); err != nil {
+		return err
+	}
+	if this.Transaction, err = aux.SignedTransaction.Decode(); err != nil {
+		return err
+	}
+	return nil
 }
 
 type NotificationSummary struct {

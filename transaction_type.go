@@ -1,6 +1,7 @@
 package apple
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 )
@@ -48,14 +49,39 @@ func (this TransactionHistoryParam) Values() url.Values {
 	return values
 }
 
-// TransactionHistoryRsp https://developer.apple.com/documentation/appstoreserverapi/historyresponse
-type TransactionHistoryRsp struct {
-	AppAppleId         int                 `json:"appAppleId"`
-	BundleId           string              `json:"bundleId"`
-	Environment        Environment         `json:"environment"`
-	HasMore            bool                `json:"hasMore"`
-	Revision           string              `json:"revision"`
-	SignedTransactions []SignedTransaction `json:"signedTransactions"`
+// TransactionHistoryResponse https://developer.apple.com/documentation/appstoreserverapi/historyresponse
+type TransactionHistoryResponse struct {
+	AppAppleId   int            `json:"appAppleId"`
+	BundleId     string         `json:"bundleId"`
+	Environment  Environment    `json:"environment"`
+	HasMore      bool           `json:"hasMore"`
+	Revision     string         `json:"revision"`
+	Transactions []*Transaction `json:"transactions"`
+}
+
+type TransactionHistoryResponseAlias TransactionHistoryResponse
+
+func (this *TransactionHistoryResponse) UnmarshalJSON(data []byte) (err error) {
+	var aux = &struct {
+		*TransactionHistoryResponseAlias
+		SignedTransactions []SignedTransaction `json:"signedTransactions"`
+	}{
+		TransactionHistoryResponseAlias: (*TransactionHistoryResponseAlias)(this),
+	}
+
+	if err = json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	for _, item := range aux.SignedTransactions {
+		var transaction *Transaction
+		transaction, err = item.Decode()
+		if err != nil {
+			return err
+		}
+		this.Transactions = append(this.Transactions, transaction)
+	}
+	return nil
 }
 
 // ConsumptionParam https://developer.apple.com/documentation/appstoreserverapi/consumptionrequest
@@ -73,6 +99,6 @@ type ConsumptionParam struct {
 	UserStatus               int    `json:"userStatus"`
 }
 
-// ConsumptionRsp https://developer.apple.com/documentation/appstoreserverapi/historyresponse
-type ConsumptionRsp struct {
+// ConsumptionResponse https://developer.apple.com/documentation/appstoreserverapi/historyresponse
+type ConsumptionResponse struct {
 }

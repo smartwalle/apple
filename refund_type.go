@@ -1,6 +1,7 @@
 package apple
 
 import (
+	"encoding/json"
 	"net/url"
 )
 
@@ -17,9 +18,35 @@ func (this RefundLookupParam) Values() url.Values {
 	return values
 }
 
-// RefundLookupRsp https://developer.apple.com/documentation/appstoreserverapi/refundhistoryresponse
-type RefundLookupRsp struct {
-	HasMore            bool                `json:"hasMore"`
-	Revision           string              `json:"revision"`
-	SignedTransactions []SignedTransaction `json:"signedTransactions"`
+// RefundLookupResponse https://developer.apple.com/documentation/appstoreserverapi/refundhistoryresponse
+type RefundLookupResponse struct {
+	HasMore      bool           `json:"hasMore"`
+	Revision     string         `json:"revision"`
+	Transactions []*Transaction `json:"transactions"`
+}
+
+type RefundLookupResponseAlias RefundLookupResponse
+
+func (this *RefundLookupResponse) UnmarshalJSON(data []byte) (err error) {
+	var aux = &struct {
+		*RefundLookupResponseAlias
+		SignedTransactions []SignedTransaction `json:"signedTransactions"`
+	}{
+		RefundLookupResponseAlias: (*RefundLookupResponseAlias)(this),
+	}
+
+	if err = json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	for _, item := range aux.SignedTransactions {
+		var transaction *Transaction
+		transaction, err = item.Decode()
+		if err != nil {
+			return err
+		}
+		this.Transactions = append(this.Transactions, transaction)
+	}
+
+	return nil
 }

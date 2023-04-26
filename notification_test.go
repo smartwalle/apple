@@ -11,6 +11,8 @@ func TestDecodeNotification(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(notification.Data.SignedTransactions.Decode())
-	t.Log(notification.Data.SignedRenewalInfo.Decode())
+	t.Log(notification.NotificationType)
+	t.Log(notification.NotificationUUID)
+	t.Log(notification.Data.Renewal)
+	t.Log(notification.Data.Transaction)
 }
