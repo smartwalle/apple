@@ -27,14 +27,23 @@ PayPal [https://github.com/smartwalle/paypal](https://github.com/smartwalle/payp
 ## 苹果内购验证
 
 ```go
-var receiptSummary, info, err = apple.VerifyReceipt(transactionId, receipt)
+var summary, info, err = apple.VerifyReceipt(transactionId, receipt)
 ```
 
 苹果内购验证支持**生产环境**和**沙箱环境**，**VerifyReceipt()** 函数内部会优先向苹果生产环境进行验证，然后根据获取到的数据判断是否要向沙箱环境进行验证。
 
 可以从 **VerifyReceipt()** 函数返回的数据中判断该支付所属的环境信息。
 
-## 通知数据解码
+## 苹果登录数据解析
+
+```go
+var client = apple.NewIdentityClient()
+var user, err = client.DecodeToken("从客户端获取到的 IdentityToken")
+```
+
+**DecodeToken()** 方法只负责对数据进行解析，验证是否为当前应用的用户，需要自行验证该方法返回值 User 对象的 BundleId 属性。
+
+## 通知数据解析
 
 ```go
 var notification, err = apple.DecodeNotification([]byte(data))
