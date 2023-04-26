@@ -29,7 +29,7 @@ func WithExcludeOldTransactions(value bool) VerifyReceiptOptionFunc {
 	}
 }
 
-type ReceiptResponse struct {
+type ReceiptSummary struct {
 	Environment        Environment           `json:"environment"`
 	IsRetryable        bool                  `json:"is_retryable"`
 	LatestReceipt      string                `json:"latest_receipt,omitempty"`
