@@ -25,16 +25,16 @@ func (this *Client) DecodeNotification(data []byte) (*Notification, error) {
 }
 
 func DecodeNotification(data []byte) (*Notification, error) {
-	var payload = &struct {
+	var aux = &struct {
 		SignedPayload string `json:"signedPayload"`
 	}{}
 
-	if err := json.Unmarshal(data, &payload); err != nil {
+	if err := json.Unmarshal(data, &aux); err != nil {
 		return nil, err
 	}
 
 	var notification = &Notification{}
-	if err := storekit.DecodeClaims(payload.SignedPayload, notification); err != nil {
+	if err := storekit.DecodeClaims(aux.SignedPayload, notification); err != nil {
 		return nil, err
 	}
 	return notification, nil
