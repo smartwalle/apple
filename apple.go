@@ -17,9 +17,9 @@ const (
 )
 
 type Client struct {
-	Client    *http.Client
-	token     *storekit.Token
-	apiDomain string
+	Client *http.Client
+	token  *storekit.Token
+	host   string
 }
 
 func New(p8file, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
@@ -33,16 +33,16 @@ func New(p8file, keyId, issuer, bundleId string, isProduction bool) (*Client, er
 	nClient.token = storekit.NewToken(pKey, keyId, issuer, bundleId)
 
 	if isProduction {
-		nClient.apiDomain = kStoreKitProduction
+		nClient.host = kStoreKitProduction
 	} else {
-		nClient.apiDomain = kStoreKitSandbox
+		nClient.host = kStoreKitSandbox
 	}
 
 	return nClient, nil
 }
 
 func (this *Client) BuildAPI(paths ...string) string {
-	var path = this.apiDomain
+	var path = this.host
 	for _, p := range paths {
 		p = strings.TrimSpace(p)
 		if len(p) > 0 {
