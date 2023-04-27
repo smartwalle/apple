@@ -19,22 +19,49 @@ const (
 	kFetchAuthKeys = "https://appleid.apple.com/auth/keys"
 )
 
-type IdentityClient struct {
-	Client *http.Client
-	keys   dbc.Cache[string, *rsa.PublicKey]
-	group  singleflight.Group[string]
+var (
+	ErrInvalidToken = errors.New("invalid token")
+)
+
+type IdentityClientOptionFunc func(opts *IdentityClient)
+
+// WithKeyExpiration 用于设置从 https://appleid.apple.com/auth/keys 获取的公钥在本地的缓存时间，单位为秒
+func WithKeyExpiration(expiration int64) IdentityClientOptionFunc {
+	return func(opts *IdentityClient) {
+		opts.expiration = expiration
+	}
 }
 
-func NewIdentityClient() *IdentityClient {
+type IdentityClient struct {
+	Client     *http.Client
+	keys       dbc.Cache[string, *rsa.PublicKey]
+	group      singleflight.Group[string]
+	expiration int64
+}
+
+func NewIdentityClient(opts ...IdentityClientOptionFunc) *IdentityClient {
 	var nClient = &IdentityClient{}
 	nClient.Client = http.DefaultClient
 	nClient.keys = dbc.New[*rsa.PublicKey]()
 	nClient.group = singleflight.New()
+	for _, opt := range opts {
+		if opt != nil {
+			opt(nClient)
+		}
+	}
+	if nClient.expiration <= 0 {
+		nClient.expiration = 300 // 默认 300 秒
+	}
 	return nClient
 }
 
 func (this *IdentityClient) DecodeToken(token string) (*User, error) {
-	headerBytes, err := base64.RawStdEncoding.DecodeString(strings.Split(token, ".")[0])
+	var payloads = strings.Split(token, ".")
+	if len(payloads) < 3 {
+		return nil, ErrInvalidToken
+	}
+
+	headerBytes, err := base64.RawStdEncoding.DecodeString(payloads[0])
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +73,7 @@ func (this *IdentityClient) DecodeToken(token string) (*User, error) {
 
 	var key = this.GetAuthKey(header.Kid)
 	if key == nil {
-		return nil, errors.New("invalid token")
+		return nil, ErrInvalidToken
 	}
 
 	var claims = &identity.Claims{}
@@ -77,7 +104,7 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 
 		// 将获取到的 key 缓存起来
 		for key, value := range nKeys {
-			this.keys.SetEx(key, value, 300) // 300 秒过期
+			this.keys.SetEx(key, value, this.expiration)
 		}
 		return nil, nil
 	})
@@ -96,20 +123,19 @@ func (this *IdentityClient) requestAuthKeys() (map[string]*rsa.PublicKey, error)
 	}
 	defer rsp.Body.Close()
 
-	var result map[string][]*identity.Key
-	if err = json.NewDecoder(rsp.Body).Decode(&result); err != nil {
+	var aux = &struct {
+		Keys []*identity.Key `json:"keys"`
+	}{}
+	if err = json.NewDecoder(rsp.Body).Decode(&aux); err != nil {
 		return nil, err
 	}
 
-	var keys = result["keys"]
-	var nKeys = make(map[string]*rsa.PublicKey, len(keys))
-
-	for _, key := range keys {
+	var nKeys = make(map[string]*rsa.PublicKey, len(aux.Keys))
+	for _, key := range aux.Keys {
 		var nKey, _ = identity.DecodePublicKey(key)
 		if nKey != nil {
 			nKeys[key.Kid] = nKey
 		}
 	}
-
 	return nKeys, nil
 }
