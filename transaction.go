@@ -18,11 +18,11 @@ func (this *Client) GetTransactionHistory(transactionId string, param Transactio
 }
 
 // SendConsumptionInformation https://developer.apple.com/documentation/appstoreserverapi/send_consumption_information
-func (this *Client) SendConsumptionInformation(transactionId string, param ConsumptionParam) (result *ConsumptionResponse, err error) {
+func (this *Client) SendConsumptionInformation(transactionId string, param ConsumptionParam) (err error) {
 	data, err := json.Marshal(param)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	err = this.request(http.MethodPut, this.BuildAPI(kTransactionConsumption, transactionId), nil, bytes.NewReader(data), &result)
-	return result, err
+	err = this.request(http.MethodPut, this.BuildAPI(kTransactionConsumption, transactionId), nil, bytes.NewReader(data), nil)
+	return err
 }

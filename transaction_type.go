@@ -98,7 +98,3 @@ type ConsumptionParam struct {
 	SampleContentProvided    bool   `json:"sampleContentProvided"`
 	UserStatus               int    `json:"userStatus"`
 }
-
-// ConsumptionResponse https://developer.apple.com/documentation/appstoreserverapi/historyresponse
-type ConsumptionResponse struct {
-}

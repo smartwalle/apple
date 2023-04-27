@@ -87,9 +87,15 @@ func (this *Client) request(method, url string, param Param, body ngx.Body, resu
 		if err = json.Unmarshal(data, &result); err != nil {
 			return err
 		}
+	case http.StatusAccepted:
+		return nil
 	case http.StatusUnauthorized:
 		return &ResponseError{Code: http.StatusUnauthorized, Message: "Unauthenticated"}
 	default:
+		if len(data) == 0 {
+			return &ResponseError{Code: rsp.StatusCode, Message: http.StatusText(rsp.StatusCode)}
+		}
+
 		var rErr *ResponseError
 		if err = json.Unmarshal(data, &rErr); err != nil {
 			return err
