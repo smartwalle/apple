@@ -102,9 +102,11 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 		// 从苹果服务器请求 key 数据
 		var nKeys, _ = this.requestAuthKeys()
 
-		// 将获取到的 key 缓存起来
-		for key, value := range nKeys {
-			this.keys.SetEx(key, value, this.expiration)
+		for _, key := range nKeys {
+			var nKey, _ = identity.DecodePublicKey(key.N, key.E)
+			if nKey != nil {
+				this.keys.SetEx(key.Kid, nKey, this.expiration)
+			}
 		}
 		return nil, nil
 	})
@@ -114,7 +116,7 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 }
 
 // requestAuthKeys https://developer.apple.com/documentation/sign_in_with_apple/fetch_apple_s_public_key_for_verifying_token_signature
-func (this *IdentityClient) requestAuthKeys() (map[string]*rsa.PublicKey, error) {
+func (this *IdentityClient) requestAuthKeys() ([]identity.Key, error) {
 	var req = ngx.NewRequest(http.MethodGet, kFetchAuthKeys, ngx.WithClient(this.Client))
 
 	var rsp, err = req.Do(context.Background())
@@ -124,18 +126,11 @@ func (this *IdentityClient) requestAuthKeys() (map[string]*rsa.PublicKey, error)
 	defer rsp.Body.Close()
 
 	var aux = &struct {
-		Keys []*identity.Key `json:"keys"`
+		Keys []identity.Key `json:"keys"`
 	}{}
 	if err = json.NewDecoder(rsp.Body).Decode(&aux); err != nil {
 		return nil, err
 	}
 
-	var nKeys = make(map[string]*rsa.PublicKey, len(aux.Keys))
-	for _, key := range aux.Keys {
-		var nKey, _ = identity.DecodePublicKey(key)
-		if nKey != nil {
-			nKeys[key.Kid] = nKey
-		}
-	}
-	return nKeys, nil
+	return aux.Keys, nil
 }

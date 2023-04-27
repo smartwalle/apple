@@ -6,12 +6,12 @@ import (
 	"math/big"
 )
 
-func DecodePublicKey(key *Key) (*rsa.PublicKey, error) {
-	nByte, err := base64.RawURLEncoding.DecodeString(key.N)
+func DecodePublicKey(n, e string) (*rsa.PublicKey, error) {
+	nByte, err := base64.RawURLEncoding.DecodeString(n)
 	if err != nil {
 		return nil, err
 	}
-	eByte, err := base64.RawURLEncoding.DecodeString(key.E)
+	eByte, err := base64.RawURLEncoding.DecodeString(e)
 	if err != nil {
 		return nil, err
 	}
