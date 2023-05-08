@@ -8,6 +8,7 @@ import (
 	"github.com/smartwalle/ngx"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -22,8 +23,8 @@ type Client struct {
 	host   string
 }
 
-func New(p8file, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
-	var pKey, err = internal.DecodePrivateKeyFromFile(p8file)
+func New(p8key []byte, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
+	var pKey, err = internal.DecodePrivateKey(p8key)
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +40,14 @@ func New(p8file, keyId, issuer, bundleId string, isProduction bool) (*Client, er
 	}
 
 	return nClient, nil
+}
+
+func NewWithKeyFile(filename, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return New(data, keyId, issuer, bundleId, isProduction)
 }
 
 func (this *Client) BuildAPI(paths ...string) string {
