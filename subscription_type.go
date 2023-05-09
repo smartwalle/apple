@@ -25,7 +25,7 @@ type LastTransaction struct {
 type LastTransactionAlias LastTransaction
 
 func (this *LastTransaction) UnmarshalJSON(data []byte) (err error) {
-	var aux = &struct {
+	var aux = struct {
 		*LastTransactionAlias
 		SignedRenewal     SignedRenewal     `json:"signedRenewalInfo"`
 		SignedTransaction SignedTransaction `json:"signedTransactionInfo"`

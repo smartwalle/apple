@@ -25,7 +25,7 @@ func (this *Client) DecodeNotification(data []byte) (*Notification, error) {
 }
 
 func DecodeNotification(data []byte) (*Notification, error) {
-	var aux = &struct {
+	var aux = struct {
 		SignedPayload string `json:"signedPayload"`
 	}{}
 

@@ -76,7 +76,7 @@ type NotificationData struct {
 type NotificationDataAlias NotificationData
 
 func (this *NotificationData) UnmarshalJSON(data []byte) (err error) {
-	var aux = &struct {
+	var aux = struct {
 		*NotificationDataAlias
 		SignedRenewal     SignedRenewal     `json:"signedRenewalInfo"`
 		SignedTransaction SignedTransaction `json:"signedTransactionInfo"`

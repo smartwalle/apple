@@ -167,7 +167,7 @@ func (this *AuthClient) requestAuthKeys() ([]auth.Key, error) {
 	}
 	defer rsp.Body.Close()
 
-	var aux = &struct {
+	var aux = struct {
 		Keys []auth.Key `json:"keys"`
 	}{}
 	if err = json.NewDecoder(rsp.Body).Decode(&aux); err != nil {

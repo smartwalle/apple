@@ -11,7 +11,7 @@ type OrderLookupResponse struct {
 type OrderLookupResponseAlias OrderLookupResponse
 
 func (this *OrderLookupResponse) UnmarshalJSON(data []byte) (err error) {
-	var aux = &struct {
+	var aux = struct {
 		*OrderLookupResponseAlias
 		SignedTransactions []SignedTransaction `json:"signedTransactions"`
 	}{

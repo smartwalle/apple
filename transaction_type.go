@@ -62,7 +62,7 @@ type TransactionHistoryResponse struct {
 type TransactionHistoryResponseAlias TransactionHistoryResponse
 
 func (this *TransactionHistoryResponse) UnmarshalJSON(data []byte) (err error) {
-	var aux = &struct {
+	var aux = struct {
 		*TransactionHistoryResponseAlias
 		SignedTransactions []SignedTransaction `json:"signedTransactions"`
 	}{

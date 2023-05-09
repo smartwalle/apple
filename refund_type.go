@@ -28,7 +28,7 @@ type RefundLookupResponse struct {
 type RefundLookupResponseAlias RefundLookupResponse
 
 func (this *RefundLookupResponse) UnmarshalJSON(data []byte) (err error) {
-	var aux = &struct {
+	var aux = struct {
 		*RefundLookupResponseAlias
 		SignedTransactions []SignedTransaction `json:"signedTransactions"`
 	}{
