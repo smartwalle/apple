@@ -37,11 +37,18 @@ var summary, info, err = apple.VerifyReceipt(transactionId, receipt)
 ## 苹果登录数据解析
 
 ```go
-var client = apple.NewIdentityClient()
+var client = apple.NewAuthClient()
 var user, err = client.DecodeToken("从客户端获取到的 IdentityToken")
 ```
 
-**DecodeToken()** 方法只负责对数据进行解析，验证是否为当前应用的用户，需要自行验证该方法返回值 User 对象的 BundleId 属性。
+## 苹果登录数据验证
+
+如果要验证 Token 的合法性，在初始化 IdentityClient 的时候，需要设置 BundleId。
+
+```go
+var client = apple.NewAuthClient(apple.WithBundleId("bundle id"))
+var user, err = client.VerifyToken("从客户端获取到的 IdentityToken")
+```
 
 ## 通知数据解析
 

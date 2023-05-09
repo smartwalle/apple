@@ -1,4 +1,4 @@
-package identity
+package auth
 
 import (
 	"crypto/rsa"

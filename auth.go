@@ -7,40 +7,53 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/smartwalle/apple/internal/identity"
+	"github.com/smartwalle/apple/internal/auth"
 	"github.com/smartwalle/dbc"
 	"github.com/smartwalle/ngx"
 	"github.com/smartwalle/nsync/singleflight"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const (
 	kFetchAuthKeys = "https://appleid.apple.com/auth/keys"
+	kIssuer        = "https://appleid.apple.com"
 )
 
 var (
-	ErrInvalidToken = errors.New("invalid token")
+	ErrInvalidToken    = errors.New("invalid token")
+	ErrInvalidIssuer   = errors.New("invalid issuer")
+	ErrInvalidBundleId = errors.New("invalid bundle id")
+	ErrTokenExpired    = errors.New("token is expired")
 )
 
-type IdentityClientOptionFunc func(opts *IdentityClient)
+type AuthOptionFunc func(opts *AuthClient)
 
 // WithKeyExpiration 用于设置从 https://appleid.apple.com/auth/keys 获取的公钥在本地的缓存时间，单位为秒
-func WithKeyExpiration(expiration int64) IdentityClientOptionFunc {
-	return func(opts *IdentityClient) {
+func WithKeyExpiration(expiration int64) AuthOptionFunc {
+	return func(opts *AuthClient) {
 		opts.expiration = expiration
 	}
 }
 
-type IdentityClient struct {
+// WithBundleId 用于设置 VerifyToken() 方法需要的 BundleId 信息
+func WithBundleId(bundleId string) AuthOptionFunc {
+	return func(opts *AuthClient) {
+		opts.bundleId = bundleId
+	}
+}
+
+type AuthClient struct {
 	Client     *http.Client
 	keys       dbc.Cache[string, *rsa.PublicKey]
 	group      singleflight.Group[string]
 	expiration int64
+	bundleId   string
 }
 
-func NewIdentityClient(opts ...IdentityClientOptionFunc) *IdentityClient {
-	var nClient = &IdentityClient{}
+func NewAuthClient(opts ...AuthOptionFunc) *AuthClient {
+	var nClient = &AuthClient{}
 	nClient.Client = http.DefaultClient
 	nClient.keys = dbc.New[*rsa.PublicKey]()
 	nClient.group = singleflight.New()
@@ -55,7 +68,9 @@ func NewIdentityClient(opts ...IdentityClientOptionFunc) *IdentityClient {
 	return nClient
 }
 
-func (this *IdentityClient) DecodeToken(token string) (*User, error) {
+// DecodeToken 解析 Token
+// 只对 Token 进行解析，不会验证合法性
+func (this *AuthClient) DecodeToken(token string) (*User, error) {
 	var payloads = strings.Split(token, ".")
 	if len(payloads) < 3 {
 		return nil, ErrInvalidToken
@@ -66,7 +81,7 @@ func (this *IdentityClient) DecodeToken(token string) (*User, error) {
 		return nil, err
 	}
 
-	var header *identity.Header
+	var header *auth.Header
 	if err = json.Unmarshal(headerBytes, &header); err != nil {
 		return nil, err
 	}
@@ -76,23 +91,50 @@ func (this *IdentityClient) DecodeToken(token string) (*User, error) {
 		return nil, ErrInvalidToken
 	}
 
-	var claims = &identity.Claims{}
+	var claims = &auth.Claims{}
 	jwt.ParseWithClaims(token, claims, func(_ *jwt.Token) (interface{}, error) {
 		return key, nil
 	})
 
-	var nUser = &User{}
-	nUser.Id = claims.Subject
-	nUser.BundleId = strings.Join(claims.Audience, ";")
-	nUser.AuthTime = claims.AuthTime
-	nUser.Email = claims.Email
-	nUser.EmailVerified = claims.EmailVerified
-	nUser.IsPrivateEmail = claims.IsPrivateEmail
-	nUser.RealUserStatus = claims.RealUserStatus
-	return nUser, nil
+	var user = &User{}
+	user.Id = claims.Subject
+	user.Issuer = claims.Issuer
+	user.BundleId = strings.Join(claims.Audience, ";")
+	user.Email = claims.Email
+	user.EmailVerified = claims.EmailVerified
+	user.IsPrivateEmail = claims.IsPrivateEmail
+	user.RealUserStatus = claims.RealUserStatus
+	user.Nonce = claims.Nonce
+	user.AuthTime = int64(claims.AuthTime)
+	user.IssuedAt = claims.IssuedAt.Unix()
+	user.ExpiresAt = claims.ExpiresAt.Unix()
+	return user, nil
 }
 
-func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
+// VerifyToken 解析并验证 Token https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user#3383769
+// 会对 Token 的合法性进行验证，主要判断 BundleId 和 Issuer 是否正确以及 Token 是否在有效期内
+func (this *AuthClient) VerifyToken(token string) (*User, error) {
+	var user, err = this.DecodeToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.BundleId != this.bundleId {
+		return nil, ErrInvalidBundleId
+	}
+
+	if user.Issuer != kIssuer {
+		return nil, ErrInvalidIssuer
+	}
+
+	if user.ExpiresAt <= time.Now().Unix() {
+		return nil, ErrTokenExpired
+	}
+
+	return user, nil
+}
+
+func (this *AuthClient) GetAuthKey(kid string) *rsa.PublicKey {
 	// 从本地缓存中查询 key 信息，存在则直接返回
 	if key, _ := this.keys.Get(kid); key != nil {
 		return key
@@ -103,7 +145,7 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 		var nKeys, _ = this.requestAuthKeys()
 
 		for _, key := range nKeys {
-			var nKey, _ = identity.DecodePublicKey(key.N, key.E)
+			var nKey, _ = auth.DecodePublicKey(key.N, key.E)
 			if nKey != nil {
 				this.keys.SetEx(key.Kid, nKey, this.expiration)
 			}
@@ -116,7 +158,7 @@ func (this *IdentityClient) GetAuthKey(kid string) *rsa.PublicKey {
 }
 
 // requestAuthKeys https://developer.apple.com/documentation/sign_in_with_apple/fetch_apple_s_public_key_for_verifying_token_signature
-func (this *IdentityClient) requestAuthKeys() ([]identity.Key, error) {
+func (this *AuthClient) requestAuthKeys() ([]auth.Key, error) {
 	var req = ngx.NewRequest(http.MethodGet, kFetchAuthKeys, ngx.WithClient(this.Client))
 
 	var rsp, err = req.Do(context.Background())
@@ -126,7 +168,7 @@ func (this *IdentityClient) requestAuthKeys() ([]identity.Key, error) {
 	defer rsp.Body.Close()
 
 	var aux = &struct {
-		Keys []identity.Key `json:"keys"`
+		Keys []auth.Key `json:"keys"`
 	}{}
 	if err = json.NewDecoder(rsp.Body).Decode(&aux); err != nil {
 		return nil, err
