@@ -84,7 +84,7 @@ func (this *NotificationData) UnmarshalJSON(data []byte) (err error) {
 		NotificationDataAlias: (*NotificationDataAlias)(this),
 	}
 
-	if err := json.Unmarshal(data, &aux); err != nil {
+	if err = json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
 
