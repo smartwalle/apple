@@ -52,6 +52,7 @@ func VerifyReceipt(transactionId, receipt string, opts ...VerifyReceiptOptionFun
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
 func GetReceipt(receipt string, opts ...VerifyReceiptOptionFunc) (*ReceiptSummary, error) {
 	var nOpt = &ReceiptOptions{}
+	nOpt.Client = http.DefaultClient
 	nOpt.Receipt = receipt
 	for _, opt := range opts {
 		if opt != nil {
@@ -86,7 +87,7 @@ func getReceipt(url string, opts *ReceiptOptions) (*ReceiptSummary, error) {
 		return nil, err
 	}
 
-	rsp, err := http.DefaultClient.Do(req)
+	rsp, err := opts.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}

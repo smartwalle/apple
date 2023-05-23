@@ -1,5 +1,7 @@
 package apple
 
+import "net/http"
+
 // 21000 App Store 无法读取你提供的JSON数据
 // 21002 收据数据不符合格式
 // 21003 收据无法被验证
@@ -10,12 +12,21 @@ package apple
 // 21008 收据信息是产品环境中使用，但却被发送到测试环境中验证
 
 type ReceiptOptions struct {
-	Receipt                string `json:"receipt-data"`
-	Password               string `json:"password,omitempty"`
-	ExcludeOldTransactions bool   `json:"exclude-old-transactions"`
+	Client                 *http.Client `json:"-"`
+	Receipt                string       `json:"receipt-data"`
+	Password               string       `json:"password,omitempty"`
+	ExcludeOldTransactions bool         `json:"exclude-old-transactions"`
 }
 
 type VerifyReceiptOptionFunc func(opts *ReceiptOptions)
+
+func WithHTTPClient(client *http.Client) VerifyReceiptOptionFunc {
+	return func(opts *ReceiptOptions) {
+		if client != nil {
+			opts.Client = client
+		}
+	}
+}
 
 func WithPassword(password string) VerifyReceiptOptionFunc {
 	return func(opts *ReceiptOptions) {
