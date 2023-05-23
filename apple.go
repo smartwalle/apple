@@ -99,7 +99,7 @@ func (this *Client) request(method, url string, param Param, body ngx.Body, resu
 	case http.StatusAccepted:
 		return nil
 	case http.StatusUnauthorized:
-		return &Error{Code: http.StatusUnauthorized, Message: "Unauthenticated"}
+		return &Error{Code: http.StatusUnauthorized, Message: http.StatusText(http.StatusUnauthorized)}
 	default:
 		if len(data) == 0 {
 			return &Error{Code: rsp.StatusCode, Message: http.StatusText(rsp.StatusCode)}
