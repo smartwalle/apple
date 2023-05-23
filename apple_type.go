@@ -18,12 +18,12 @@ type Param interface {
 	Values() url.Values
 }
 
-type ResponseError struct {
+type Error struct {
 	Code    int    `json:"errorCode"`
 	Message string `json:"errorMessage"`
 }
 
-func (this *ResponseError) Error() string {
+func (this *Error) Error() string {
 	return fmt.Sprintf("%d - %s", this.Code, this.Message)
 }
 

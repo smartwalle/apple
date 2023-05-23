@@ -99,13 +99,13 @@ func (this *Client) request(method, url string, param Param, body ngx.Body, resu
 	case http.StatusAccepted:
 		return nil
 	case http.StatusUnauthorized:
-		return &ResponseError{Code: http.StatusUnauthorized, Message: "Unauthenticated"}
+		return &Error{Code: http.StatusUnauthorized, Message: "Unauthenticated"}
 	default:
 		if len(data) == 0 {
-			return &ResponseError{Code: rsp.StatusCode, Message: http.StatusText(rsp.StatusCode)}
+			return &Error{Code: rsp.StatusCode, Message: http.StatusText(rsp.StatusCode)}
 		}
 
-		var rErr *ResponseError
+		var rErr *Error
 		if err = json.Unmarshal(data, &rErr); err != nil {
 			return err
 		}
