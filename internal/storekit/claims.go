@@ -11,8 +11,7 @@ import (
 	"strings"
 )
 
-const kRootPEM = `
------BEGIN CERTIFICATE-----
+const kRootPEM = `-----BEGIN CERTIFICATE-----
 MIICQzCCAcmgAwIBAgIILcX8iNLFS5UwCgYIKoZIzj0EAwMwZzEbMBkGA1UEAwwS
 QXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9u
 IEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcN
@@ -45,27 +44,27 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 		return err
 	}
 
-	rootCert, err := ncrypto.ParseCertificate(ncrypto.FormatCertificate(header.X5C[2]))
+	rootCert, err := ncrypto.DecodeCertificate([]byte(kRootPEM))
 	if err != nil {
 		return err
 	}
 
-	intermediateCert, err := ncrypto.ParseCertificate(ncrypto.FormatCertificate(header.X5C[1]))
+	intermediateCert, err := ncrypto.DecodeCertificate([]byte(header.X5C[1]))
 	if err != nil {
 		return err
 	}
 
-	leafCert, err := ncrypto.ParseCertificate(ncrypto.FormatCertificate(header.X5C[0]))
+	cert, err := ncrypto.DecodeCertificate([]byte(header.X5C[0]))
 	if err != nil {
 		return err
 	}
 
-	if err = verifyCert(rootCert, intermediateCert, leafCert); err != nil {
+	if err = verifyCert(rootCert, intermediateCert, cert); err != nil {
 		return err
 	}
 
 	if _, err = jwt.ParseWithClaims(payload, claims, func(token *jwt.Token) (interface{}, error) {
-		switch publicKey := leafCert.PublicKey.(type) {
+		switch publicKey := cert.PublicKey.(type) {
 		case *ecdsa.PublicKey:
 			return publicKey, nil
 		default:
@@ -77,23 +76,19 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 	return nil
 }
 
-func verifyCert(rootCert, intermediateCert, leafCert *x509.Certificate) error {
+func verifyCert(rootCert, intermediateCert, cert *x509.Certificate) error {
 	var roots = x509.NewCertPool()
-	if !roots.AppendCertsFromPEM([]byte(kRootPEM)) {
-		return errors.New("failed to load root certificate")
-	}
+	roots.AddCert(rootCert)
 
 	var intermediates = x509.NewCertPool()
 	intermediates.AddCert(intermediateCert)
+	intermediates.AddCert(rootCert)
 
 	var opts = x509.VerifyOptions{
 		Roots:         roots,
 		Intermediates: intermediates,
 	}
-	if _, err := rootCert.Verify(opts); err != nil {
-		return err
-	}
-	if _, err := leafCert.Verify(opts); err != nil {
+	if _, err := cert.Verify(opts); err != nil {
 		return err
 	}
 	return nil

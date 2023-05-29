@@ -3,8 +3,8 @@ package apple
 import (
 	"context"
 	"encoding/json"
-	"github.com/smartwalle/apple/internal"
 	"github.com/smartwalle/apple/internal/storekit"
+	"github.com/smartwalle/ncrypto"
 	"github.com/smartwalle/ngx"
 	"io"
 	"net/http"
@@ -24,7 +24,7 @@ type Client struct {
 }
 
 func New(p8key []byte, keyId, issuer, bundleId string, isProduction bool) (*Client, error) {
-	var pKey, err = internal.DecodePrivateKey(p8key)
+	var pKey, err = ncrypto.DecodePrivateKey(p8key).PKCS8().ECDSAPrivateKey()
 	if err != nil {
 		return nil, err
 	}
