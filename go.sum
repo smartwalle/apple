@@ -8,6 +8,8 @@ github.com/smartwalle/ncrypto v1.0.0 h1:nQFxIS3fRgr8V0xRkhnfNQOrcJGPNF6d5XzFwVm7
 github.com/smartwalle/ncrypto v1.0.0/go.mod h1:NmCbG0nLnSDnMImEDrjptFKs0PiLThnFkjQSMtGYgs4=
 github.com/smartwalle/ncrypto v1.0.1 h1:CVe/h/srt6knLiF/9V5OnDDhguskWR801meHizq7KmU=
 github.com/smartwalle/ncrypto v1.0.1/go.mod h1:Dwlp6sfeNaPMnOxMNayMTacvC5JGEVln3CVdiVDgbBk=
+github.com/smartwalle/ncrypto v1.0.2 h1:pTAhCqtPCMhpOwFXX+EcMdR6PNzruBNoGQrN2S1GbGI=
+github.com/smartwalle/ncrypto v1.0.2/go.mod h1:Dwlp6sfeNaPMnOxMNayMTacvC5JGEVln3CVdiVDgbBk=
 github.com/smartwalle/ngx v1.0.5 h1:L31bGSybA/h9jh2/Aj6+oqjgKl4PU5Vzt6Kh+ewCEqI=
 github.com/smartwalle/ngx v1.0.5/go.mod h1:mx/nz2Pk5j+RBs7t6u6k22MPiBG/8CtOMpCnALIG8Y0=
 github.com/smartwalle/ngx v1.0.6 h1:JPNqNOIj+2nxxFtrSkJO+vKJfeNUSEQueck/Wworjps=
