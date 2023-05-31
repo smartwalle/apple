@@ -24,6 +24,8 @@ import github.com/smartwalle/apple
 
 PayPal [https://github.com/smartwalle/paypal](https://github.com/smartwalle/paypal)
 
+银联支付 [https://github.com/smartwalle/unionpay](https://github.com/smartwalle/unionpay)
+
 ## 苹果内购验证
 
 ```go
