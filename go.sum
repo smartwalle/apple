@@ -4,6 +4,8 @@ github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/smartwalle/dbc v0.0.18 h1:HeAebZJDCuATkPLfIZnFFyK+vMqblL0vacoCWvSyCgk=
 github.com/smartwalle/dbc v0.0.18/go.mod h1:JsFDfdJxgPbT/6X4kUw/mDumKIH/f3vKpV5EPIuDfqg=
+github.com/smartwalle/dbc v0.0.19 h1:ywyxJVFVgycp2bWTFyOf/OiyA8UB4Pn+p/RfNuN7rmk=
+github.com/smartwalle/dbc v0.0.19/go.mod h1:mO9WdNrdrwUW2Ty2H6hF17aEFXySxQwKmmoJa9wO+AQ=
 github.com/smartwalle/ncrypto v1.0.0 h1:nQFxIS3fRgr8V0xRkhnfNQOrcJGPNF6d5XzFwVm79KU=
 github.com/smartwalle/ncrypto v1.0.0/go.mod h1:NmCbG0nLnSDnMImEDrjptFKs0PiLThnFkjQSMtGYgs4=
 github.com/smartwalle/ncrypto v1.0.1 h1:CVe/h/srt6knLiF/9V5OnDDhguskWR801meHizq7KmU=
@@ -18,3 +20,5 @@ github.com/smartwalle/nsync v0.0.4 h1:QEiw/THw0oiyxMVvUhcoTKPN6r4v3oBVqiYQoHIMAy
 github.com/smartwalle/nsync v0.0.4/go.mod h1:nMMP9E4eXlpDrSW8amkScDfrwyQt7VKpG2PJzeS6U+I=
 github.com/smartwalle/queue v0.0.3 h1:6QpTliu/gS2vdk/vXXDU8WEcC0/d/M/Ft+xXxkv9kRw=
 github.com/smartwalle/queue v0.0.3/go.mod h1:zMEHt/7zLtVwATDUQi3OdBUlbQ2XUzWd7OXP8p/684c=
+github.com/smartwalle/queue v0.0.4 h1:h2YfM/I1yjPOQjMkhPOVuN5cSk62fRPqzqhlyZ/5zDA=
+github.com/smartwalle/queue v0.0.4/go.mod h1:zMEHt/7zLtVwATDUQi3OdBUlbQ2XUzWd7OXP8p/684c=
