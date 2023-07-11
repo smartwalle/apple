@@ -26,7 +26,7 @@ PayPal [https://github.com/smartwalle/paypal](https://github.com/smartwalle/payp
 
 银联支付 [https://github.com/smartwalle/unionpay](https://github.com/smartwalle/unionpay)
 
-## 苹果内购验证
+## 苹果内购验证（旧）
 
 ```go
 var summary, info, err = apple.VerifyReceipt(transactionId, receipt)
@@ -35,6 +35,12 @@ var summary, info, err = apple.VerifyReceipt(transactionId, receipt)
 苹果内购验证支持**生产环境**和**沙箱环境**，**VerifyReceipt()** 函数内部会优先向苹果生产环境进行验证，然后根据获取到的数据判断是否要向沙箱环境进行验证。
 
 可以从 **VerifyReceipt()** 函数返回的数据中判断该支付所属的环境信息。
+
+## 苹果内购验证（新）
+
+根据苹果[官方文档](https://developer.apple.com/documentation/appstorereceipts/verifyreceipt)所示，原 verifyReceipt 接口已经标记为 Deprecated，新的接口已经整合到 [App Store Server API](https://developer.apple.com/documentation/appstoreserverapi/get_transaction_info)。
+
+新的验证需要参考本文档[其它接口](https://github.com/smartwalle/apple#%E5%85%B6%E5%AE%83%E6%8E%A5%E5%8F%A3)部分对 apple.Client 进行实例化，然后调用其 GetTransaction() 方法进行查询。
 
 ## 苹果登录数据解析
 
@@ -79,6 +85,7 @@ func apple(c *gin.Context) {
 
 ## 其它接口
 
+* **[Get Transaction Info](https://developer.apple.com/documentation/appstoreserverapi/get_transaction_info)**
 * **[Look Up Order ID](https://developer.apple.com/documentation/appstoreserverapi/look_up_order_id)**
 * **[Get Refund History](https://developer.apple.com/documentation/appstoreserverapi/get_refund_history)**
 * **[Get All Subscription Statuses](https://developer.apple.com/documentation/appstoreserverapi/get_all_subscription_statuses)**
@@ -91,6 +98,7 @@ func apple(c *gin.Context) {
 ```go
 var client, _ = apple.New(keyfile, keyId, issuer, bundleId, isProduction)
 ```
+
 #### 关于 keyfile, keyId, issuer 如何获取？
 
 [Creating API Keys to Use With the App Store Server API
