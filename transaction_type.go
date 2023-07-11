@@ -6,6 +6,34 @@ import (
 	"net/url"
 )
 
+// TransactionResponse https://developer.apple.com/documentation/appstoreserverapi/transactioninforesponse
+type TransactionResponse struct {
+	*Transaction `json:"transaction"`
+}
+
+type TransactionResponseAlias TransactionResponse
+
+func (this *TransactionResponse) UnmarshalJSON(data []byte) (err error) {
+	var aux = struct {
+		*TransactionResponseAlias
+		SignedTransactions SignedTransaction `json:"signedTransactionInfo"`
+	}{
+		TransactionResponseAlias: (*TransactionResponseAlias)(this),
+	}
+
+	if err = json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	var transaction *Transaction
+	transaction, err = aux.SignedTransactions.Decode()
+	if err != nil {
+		return err
+	}
+	this.Transaction = transaction
+	return nil
+}
+
 // TransactionHistoryParam https://developer.apple.com/documentation/appstoreserverapi/get_transaction_history#query-parameters
 type TransactionHistoryParam struct {
 	Revision                    string
@@ -16,7 +44,7 @@ type TransactionHistoryParam struct {
 	Sort                        string
 	SubscriptionGroupIdentifier string
 	InAppOwnershipType          string
-	ExcludeRevoked              bool
+	Revoked                     bool
 }
 
 func (this TransactionHistoryParam) Values() url.Values {
@@ -45,7 +73,7 @@ func (this TransactionHistoryParam) Values() url.Values {
 	if this.InAppOwnershipType != "" {
 		values.Set("inAppOwnershipType", this.InAppOwnershipType)
 	}
-	values.Set("excludeRevoked", fmt.Sprintf("%v", this.ExcludeRevoked))
+	values.Set("revoked", fmt.Sprintf("%v", this.Revoked))
 	return values
 }
 

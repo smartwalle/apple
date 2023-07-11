@@ -7,9 +7,16 @@ import (
 )
 
 const (
+	kTransaction            = "/v1/transactions/"
 	kTransactionHistory     = "/v1/history/"
 	kTransactionConsumption = "/v1/transactions/consumption/"
 )
+
+// GetTransaction https://developer.apple.com/documentation/appstoreserverapi/get_transaction_info
+func (this *Client) GetTransaction(transactionId string) (result *TransactionResponse, err error) {
+	err = this.request(http.MethodGet, this.BuildAPI(kTransaction, transactionId), nil, nil, &result)
+	return result, err
+}
 
 // GetTransactionHistory https://developer.apple.com/documentation/appstoreserverapi/get_transaction_history
 func (this *Client) GetTransactionHistory(transactionId string, param TransactionHistoryParam) (result *TransactionHistoryResponse, err error) {

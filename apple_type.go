@@ -89,6 +89,9 @@ type Transaction struct {
 	RevocationReason            int                `json:"revocationReason"`
 	RevocationDate              int64              `json:"revocationDate"`
 	IsUpgraded                  bool               `json:"isUpgraded"`
+	Storefront                  string             `json:"storefront"`
+	StorefrontId                string             `json:"storefrontId"`
+	TransactionReason           string             `json:"transactionReason"`
 }
 
 type SignedRenewal string

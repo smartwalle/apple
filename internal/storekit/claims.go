@@ -39,6 +39,9 @@ func DecodeClaims(payload string, claims jwt.Claims) error {
 		return err
 	}
 
+	//var data, _ = base64.RawStdEncoding.DecodeString(strings.Split(payload, ".")[1])
+	//fmt.Println(string(data))
+
 	var header *Header
 	if err = json.Unmarshal(headerBytes, &header); err != nil {
 		return err
