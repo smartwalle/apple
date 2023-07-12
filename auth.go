@@ -69,6 +69,7 @@ func NewAuthClient(opts ...AuthOptionFunc) *AuthClient {
 }
 
 // DecodeToken 解析 Token
+//
 // 只对 Token 进行解析，不会验证合法性
 func (this *AuthClient) DecodeToken(token string) (*User, error) {
 	var payloads = strings.Split(token, ".")
@@ -112,6 +113,7 @@ func (this *AuthClient) DecodeToken(token string) (*User, error) {
 }
 
 // VerifyToken 解析并验证 Token https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user#3383769
+//
 // 会对 Token 的合法性进行验证，主要判断 BundleId 和 Issuer 是否正确以及 Token 是否在有效期内
 func (this *AuthClient) VerifyToken(token string) (*User, error) {
 	var user, err = this.DecodeToken(token)
