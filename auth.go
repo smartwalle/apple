@@ -47,7 +47,7 @@ func WithBundleId(bundleId string) AuthOptionFunc {
 type AuthClient struct {
 	Client     *http.Client
 	keys       dbc.Cache[string, *rsa.PublicKey]
-	group      singleflight.Group[string]
+	group      singleflight.Group[string, interface{}]
 	expiration int64
 	bundleId   string
 }
@@ -56,7 +56,7 @@ func NewAuthClient(opts ...AuthOptionFunc) *AuthClient {
 	var nClient = &AuthClient{}
 	nClient.Client = http.DefaultClient
 	nClient.keys = dbc.New[*rsa.PublicKey]()
-	nClient.group = singleflight.New()
+	nClient.group = singleflight.New[interface{}]()
 	for _, opt := range opts {
 		if opt != nil {
 			opt(nClient)

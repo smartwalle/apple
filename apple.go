@@ -69,16 +69,16 @@ func (this *Client) BuildAPI(paths ...string) string {
 	return path
 }
 
-func (this *Client) request(method, url string, param Param, body ngx.Body, result interface{}) (err error) {
+func (this *Client) request(method, url string, param Param, body io.Reader, result interface{}) (err error) {
 	var req = ngx.NewRequest(method, url, ngx.WithClient(this.Client))
 	if param != nil {
-		req.SetParams(param.Values())
+		req.SetForm(param.Values())
 	}
 	if body != nil {
 		req.SetBody(body)
 		req.SetContentType(ngx.ContentTypeJSON)
 	}
-	req.SetHeader("Authorization", this.token.Bearer())
+	req.Header().Set("Authorization", this.token.Bearer())
 
 	rsp, err := req.Do(context.Background())
 	if err != nil {
