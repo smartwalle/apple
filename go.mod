@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/smartwalle/dbc v0.0.19
 	github.com/smartwalle/ncrypto v1.0.3
-	github.com/smartwalle/ngx v1.0.7
+	github.com/smartwalle/ngx v1.0.8
 	github.com/smartwalle/nsync v0.0.6
 )
 
