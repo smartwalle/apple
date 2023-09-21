@@ -131,5 +131,6 @@ type Renewal struct {
 	PriceIncreaseStatus         int             `json:"priceIncreaseStatus"`
 	ProductId                   string          `json:"productId"`
 	RecentSubscriptionStartDate int64           `json:"recentSubscriptionStartDate"`
+	RenewalDate                 int64           `json:"renewalDate"`
 	SignedDate                  int64           `json:"signedDate"`
 }

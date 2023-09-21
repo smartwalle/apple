@@ -10,6 +10,7 @@ type TestNotificationResponse struct {
 	TestNotificationToken string `json:"testNotificationToken"`
 }
 
+// NotificationType https://developer.apple.com/documentation/appstoreservernotifications/notificationtype
 type NotificationType string
 
 const (
@@ -24,6 +25,7 @@ const (
 	NotificationTypePriceIncrease          NotificationType = "PRICE_INCREASE"
 	NotificationTypeRefund                 NotificationType = "REFUND"
 	NotificationTypeRefundDeclined         NotificationType = "REFUND_DECLINED"
+	NotificationTypeRefundReversed         NotificationType = "REFUND_REVERSED"
 	NotificationTypeRenewalExtended        NotificationType = "RENEWAL_EXTENDED"
 	NotificationTypeRenewalExtension       NotificationType = "RENEWAL_EXTENSION"
 	NotificationTypeRevoke                 NotificationType = "REVOKE"
@@ -31,6 +33,7 @@ const (
 	NotificationTypeTest                   NotificationType = "TEST"
 )
 
+// NotificationSubType https://developer.apple.com/documentation/appstoreservernotifications/subtype
 type NotificationSubType string
 
 const (
@@ -69,6 +72,7 @@ type NotificationData struct {
 	BundleId      string       `json:"bundleId"`
 	BundleVersion string       `json:"bundleVersion"`
 	Environment   Environment  `json:"environment"`
+	Status        int          `json:"status"` // https://developer.apple.com/documentation/appstoreservernotifications/status
 	Renewal       *Renewal     `json:"renewal"`
 	Transaction   *Transaction `json:"transaction"`
 }
