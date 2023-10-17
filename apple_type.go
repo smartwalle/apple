@@ -23,8 +23,8 @@ type Error struct {
 	Message string `json:"errorMessage"`
 }
 
-func (this *Error) Error() string {
-	return fmt.Sprintf("%d - %s", this.Code, this.Message)
+func (e Error) Error() string {
+	return fmt.Sprintf("%d - %s", e.Code, e.Message)
 }
 
 type SignedTransaction string

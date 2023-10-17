@@ -71,7 +71,7 @@ func NewAuthClient(opts ...AuthOptionFunc) *AuthClient {
 // DecodeToken 解析 Token
 //
 // 只对 Token 进行解析，不会验证合法性
-func (this *AuthClient) DecodeToken(token string) (*User, error) {
+func (c *AuthClient) DecodeToken(token string) (*User, error) {
 	var payloads = strings.Split(token, ".")
 	if len(payloads) < 3 {
 		return nil, ErrInvalidToken
@@ -87,7 +87,7 @@ func (this *AuthClient) DecodeToken(token string) (*User, error) {
 		return nil, err
 	}
 
-	var key = this.GetAuthKey(header.Kid)
+	var key = c.GetAuthKey(header.Kid)
 	if key == nil {
 		return nil, ErrInvalidToken
 	}
@@ -115,13 +115,13 @@ func (this *AuthClient) DecodeToken(token string) (*User, error) {
 // VerifyToken 解析并验证 Token https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user#3383769
 //
 // 会对 Token 的合法性进行验证，主要判断 BundleId 和 Issuer 是否正确以及 Token 是否在有效期内
-func (this *AuthClient) VerifyToken(token string) (*User, error) {
-	var user, err = this.DecodeToken(token)
+func (c *AuthClient) VerifyToken(token string) (*User, error) {
+	var user, err = c.DecodeToken(token)
 	if err != nil {
 		return nil, err
 	}
 
-	if user.BundleId != this.bundleId {
+	if user.BundleId != c.bundleId {
 		return nil, ErrInvalidBundleId
 	}
 
@@ -136,32 +136,32 @@ func (this *AuthClient) VerifyToken(token string) (*User, error) {
 	return user, nil
 }
 
-func (this *AuthClient) GetAuthKey(kid string) *rsa.PublicKey {
+func (c *AuthClient) GetAuthKey(kid string) *rsa.PublicKey {
 	// 从本地缓存中查询 key 信息，存在则直接返回
-	if key, _ := this.keys.Get(kid); key != nil {
+	if key, _ := c.keys.Get(kid); key != nil {
 		return key
 	}
 
-	this.group.Do(kFetchAuthKeys, func(_ string) (interface{}, error) {
+	c.group.Do(kFetchAuthKeys, func(_ string) (interface{}, error) {
 		// 从苹果服务器请求 key 数据
-		var nKeys, _ = this.requestAuthKeys()
+		var nKeys, _ = c.requestAuthKeys()
 
 		for _, key := range nKeys {
 			var nKey, _ = auth.DecodePublicKey(key.N, key.E)
 			if nKey != nil {
-				this.keys.SetEx(key.Kid, nKey, this.expiration)
+				c.keys.SetEx(key.Kid, nKey, c.expiration)
 			}
 		}
 		return nil, nil
 	})
 
-	key, _ := this.keys.Get(kid)
+	key, _ := c.keys.Get(kid)
 	return key
 }
 
 // requestAuthKeys https://developer.apple.com/documentation/sign_in_with_apple/fetch_apple_s_public_key_for_verifying_token_signature
-func (this *AuthClient) requestAuthKeys() ([]auth.Key, error) {
-	var req = ngx.NewRequest(http.MethodGet, kFetchAuthKeys, ngx.WithClient(this.Client))
+func (c *AuthClient) requestAuthKeys() ([]auth.Key, error) {
+	var req = ngx.NewRequest(http.MethodGet, kFetchAuthKeys, ngx.WithClient(c.Client))
 
 	var rsp, err = req.Do(context.Background())
 	if err != nil {

@@ -13,12 +13,12 @@ type TransactionResponse struct {
 
 type TransactionResponseAlias TransactionResponse
 
-func (this *TransactionResponse) UnmarshalJSON(data []byte) (err error) {
+func (t *TransactionResponse) UnmarshalJSON(data []byte) (err error) {
 	var aux = struct {
 		*TransactionResponseAlias
 		SignedTransactions SignedTransaction `json:"signedTransactionInfo"`
 	}{
-		TransactionResponseAlias: (*TransactionResponseAlias)(this),
+		TransactionResponseAlias: (*TransactionResponseAlias)(t),
 	}
 
 	if err = json.Unmarshal(data, &aux); err != nil {
@@ -30,7 +30,7 @@ func (this *TransactionResponse) UnmarshalJSON(data []byte) (err error) {
 	if err != nil {
 		return err
 	}
-	this.Transaction = transaction
+	t.Transaction = transaction
 	return nil
 }
 
@@ -47,33 +47,33 @@ type TransactionHistoryParam struct {
 	Revoked                     bool
 }
 
-func (this TransactionHistoryParam) Values() url.Values {
+func (t TransactionHistoryParam) Values() url.Values {
 	var values = url.Values{}
-	if this.Revision != "" {
-		values.Set("revision", this.Revision)
+	if t.Revision != "" {
+		values.Set("revision", t.Revision)
 	}
-	if this.StartDate != "" {
-		values.Set("startDate", this.StartDate)
+	if t.StartDate != "" {
+		values.Set("startDate", t.StartDate)
 	}
-	if this.EndDate != "" {
-		values.Set("endDate", this.EndDate)
+	if t.EndDate != "" {
+		values.Set("endDate", t.EndDate)
 	}
-	if this.ProductId != "" {
-		values.Set("productId", this.ProductId)
+	if t.ProductId != "" {
+		values.Set("productId", t.ProductId)
 	}
-	if this.ProductType != "" {
-		values.Set("productType", this.ProductType)
+	if t.ProductType != "" {
+		values.Set("productType", t.ProductType)
 	}
-	if this.Sort != "" {
-		values.Set("sort", this.Sort)
+	if t.Sort != "" {
+		values.Set("sort", t.Sort)
 	}
-	if this.SubscriptionGroupIdentifier != "" {
-		values.Set("subscriptionGroupIdentifier", this.SubscriptionGroupIdentifier)
+	if t.SubscriptionGroupIdentifier != "" {
+		values.Set("subscriptionGroupIdentifier", t.SubscriptionGroupIdentifier)
 	}
-	if this.InAppOwnershipType != "" {
-		values.Set("inAppOwnershipType", this.InAppOwnershipType)
+	if t.InAppOwnershipType != "" {
+		values.Set("inAppOwnershipType", t.InAppOwnershipType)
 	}
-	values.Set("revoked", fmt.Sprintf("%v", this.Revoked))
+	values.Set("revoked", fmt.Sprintf("%v", t.Revoked))
 	return values
 }
 
@@ -89,12 +89,12 @@ type TransactionHistoryResponse struct {
 
 type TransactionHistoryResponseAlias TransactionHistoryResponse
 
-func (this *TransactionHistoryResponse) UnmarshalJSON(data []byte) (err error) {
+func (t *TransactionHistoryResponse) UnmarshalJSON(data []byte) (err error) {
 	var aux = struct {
 		*TransactionHistoryResponseAlias
 		SignedTransactions []SignedTransaction `json:"signedTransactions"`
 	}{
-		TransactionHistoryResponseAlias: (*TransactionHistoryResponseAlias)(this),
+		TransactionHistoryResponseAlias: (*TransactionHistoryResponseAlias)(t),
 	}
 
 	if err = json.Unmarshal(data, &aux); err != nil {
@@ -107,7 +107,7 @@ func (this *TransactionHistoryResponse) UnmarshalJSON(data []byte) (err error) {
 		if err != nil {
 			return err
 		}
-		this.Transactions = append(this.Transactions, transaction)
+		t.Transactions = append(t.Transactions, transaction)
 	}
 	return nil
 }

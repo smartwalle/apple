@@ -79,23 +79,23 @@ type NotificationData struct {
 
 type NotificationDataAlias NotificationData
 
-func (this *NotificationData) UnmarshalJSON(data []byte) (err error) {
+func (n *NotificationData) UnmarshalJSON(data []byte) (err error) {
 	var aux = struct {
 		*NotificationDataAlias
 		SignedRenewal     SignedRenewal     `json:"signedRenewalInfo"`
 		SignedTransaction SignedTransaction `json:"signedTransactionInfo"`
 	}{
-		NotificationDataAlias: (*NotificationDataAlias)(this),
+		NotificationDataAlias: (*NotificationDataAlias)(n),
 	}
 
 	if err = json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
 
-	if this.Renewal, err = aux.SignedRenewal.Decode(); err != nil {
+	if n.Renewal, err = aux.SignedRenewal.Decode(); err != nil {
 		return err
 	}
-	if this.Transaction, err = aux.SignedTransaction.Decode(); err != nil {
+	if n.Transaction, err = aux.SignedTransaction.Decode(); err != nil {
 		return err
 	}
 	return nil

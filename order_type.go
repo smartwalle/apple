@@ -10,12 +10,12 @@ type OrderLookupResponse struct {
 
 type OrderLookupResponseAlias OrderLookupResponse
 
-func (this *OrderLookupResponse) UnmarshalJSON(data []byte) (err error) {
+func (o *OrderLookupResponse) UnmarshalJSON(data []byte) (err error) {
 	var aux = struct {
 		*OrderLookupResponseAlias
 		SignedTransactions []SignedTransaction `json:"signedTransactions"`
 	}{
-		OrderLookupResponseAlias: (*OrderLookupResponseAlias)(this),
+		OrderLookupResponseAlias: (*OrderLookupResponseAlias)(o),
 	}
 
 	if err = json.Unmarshal(data, &aux); err != nil {
@@ -28,7 +28,7 @@ func (this *OrderLookupResponse) UnmarshalJSON(data []byte) (err error) {
 		if err != nil {
 			return err
 		}
-		this.Transactions = append(this.Transactions, transaction)
+		o.Transactions = append(o.Transactions, transaction)
 	}
 	return nil
 }

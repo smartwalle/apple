@@ -7,7 +7,7 @@ const (
 )
 
 // RefundLookup https://developer.apple.com/documentation/appstoreserverapi/get_refund_history
-func (this *Client) RefundLookup(transactionId string, param RefundLookupParam) (result *RefundLookupResponse, err error) {
-	err = this.request(http.MethodGet, this.BuildAPI(kRefundLookup, transactionId), param, nil, &result)
+func (c *Client) RefundLookup(transactionId string, param RefundLookupParam) (result *RefundLookupResponse, err error) {
+	err = c.request(http.MethodGet, c.BuildAPI(kRefundLookup, transactionId), param, nil, &result)
 	return result, err
 }

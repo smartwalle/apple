@@ -10,10 +10,10 @@ type RefundLookupParam struct {
 	Revision string
 }
 
-func (this RefundLookupParam) Values() url.Values {
+func (r RefundLookupParam) Values() url.Values {
 	var values = url.Values{}
-	if this.Revision != "" {
-		values.Set("revision", this.Revision)
+	if r.Revision != "" {
+		values.Set("revision", r.Revision)
 	}
 	return values
 }
@@ -27,12 +27,12 @@ type RefundLookupResponse struct {
 
 type RefundLookupResponseAlias RefundLookupResponse
 
-func (this *RefundLookupResponse) UnmarshalJSON(data []byte) (err error) {
+func (r *RefundLookupResponse) UnmarshalJSON(data []byte) (err error) {
 	var aux = struct {
 		*RefundLookupResponseAlias
 		SignedTransactions []SignedTransaction `json:"signedTransactions"`
 	}{
-		RefundLookupResponseAlias: (*RefundLookupResponseAlias)(this),
+		RefundLookupResponseAlias: (*RefundLookupResponseAlias)(r),
 	}
 
 	if err = json.Unmarshal(data, &aux); err != nil {
@@ -45,7 +45,7 @@ func (this *RefundLookupResponse) UnmarshalJSON(data []byte) (err error) {
 		if err != nil {
 			return err
 		}
-		this.Transactions = append(this.Transactions, transaction)
+		r.Transactions = append(r.Transactions, transaction)
 	}
 
 	return nil

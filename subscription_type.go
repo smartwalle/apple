@@ -24,23 +24,23 @@ type LastTransaction struct {
 
 type LastTransactionAlias LastTransaction
 
-func (this *LastTransaction) UnmarshalJSON(data []byte) (err error) {
+func (t *LastTransaction) UnmarshalJSON(data []byte) (err error) {
 	var aux = struct {
 		*LastTransactionAlias
 		SignedRenewal     SignedRenewal     `json:"signedRenewalInfo"`
 		SignedTransaction SignedTransaction `json:"signedTransactionInfo"`
 	}{
-		LastTransactionAlias: (*LastTransactionAlias)(this),
+		LastTransactionAlias: (*LastTransactionAlias)(t),
 	}
 
 	if err = json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
 
-	if this.Renewal, err = aux.SignedRenewal.Decode(); err != nil {
+	if t.Renewal, err = aux.SignedRenewal.Decode(); err != nil {
 		return err
 	}
-	if this.Transaction, err = aux.SignedTransaction.Decode(); err != nil {
+	if t.Transaction, err = aux.SignedTransaction.Decode(); err != nil {
 		return err
 	}
 	return nil

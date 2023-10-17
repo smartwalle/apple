@@ -11,8 +11,8 @@ const (
 )
 
 // RequestTestNotification https://developer.apple.com/documentation/appstoreserverapi/request_a_test_notification
-func (this *Client) RequestTestNotification() (result *TestNotificationResponse, err error) {
-	err = this.request(http.MethodPost, this.BuildAPI(kTestNotification), nil, nil, &result)
+func (c *Client) RequestTestNotification() (result *TestNotificationResponse, err error) {
+	err = c.request(http.MethodPost, c.BuildAPI(kTestNotification), nil, nil, &result)
 	return result, err
 }
 
@@ -20,7 +20,7 @@ func (this *Client) RequestTestNotification() (result *TestNotificationResponse,
 //
 // 关于接收到苹果服务器推送的通知之后，业务服务器如何响应参照：
 // https://developer.apple.com/documentation/appstoreservernotifications/responding_to_app_store_server_notifications
-func (this *Client) DecodeNotification(data []byte) (*Notification, error) {
+func (c *Client) DecodeNotification(data []byte) (*Notification, error) {
 	return DecodeNotification(data)
 }
 

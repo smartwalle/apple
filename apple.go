@@ -50,8 +50,8 @@ func NewWithKeyFile(filename, keyId, issuer, bundleId string, isProduction bool)
 	return New(data, keyId, issuer, bundleId, isProduction)
 }
 
-func (this *Client) BuildAPI(paths ...string) string {
-	var path = this.host
+func (c *Client) BuildAPI(paths ...string) string {
+	var path = c.host
 	for _, p := range paths {
 		p = strings.TrimSpace(p)
 		if len(p) > 0 {
@@ -69,8 +69,8 @@ func (this *Client) BuildAPI(paths ...string) string {
 	return path
 }
 
-func (this *Client) request(method, url string, param Param, body io.Reader, result interface{}) (err error) {
-	var req = ngx.NewRequest(method, url, ngx.WithClient(this.Client))
+func (c *Client) request(method, url string, param Param, body io.Reader, result interface{}) (err error) {
+	var req = ngx.NewRequest(method, url, ngx.WithClient(c.Client))
 	if param != nil {
 		req.SetForm(param.Values())
 	}
@@ -78,7 +78,7 @@ func (this *Client) request(method, url string, param Param, body io.Reader, res
 		req.SetBody(body)
 		req.SetContentType(ngx.ContentTypeJSON)
 	}
-	req.Header().Set("Authorization", this.token.Bearer())
+	req.Header().Set("Authorization", c.token.Bearer())
 
 	rsp, err := req.Do(context.Background())
 	if err != nil {

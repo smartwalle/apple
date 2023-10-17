@@ -33,36 +33,36 @@ func NewToken(privateKey *ecdsa.PrivateKey, keyId, issuer, bundleId string) *Tok
 	}
 }
 
-func (this *Token) generate() (string, int64, error) {
+func (t *Token) generate() (string, int64, error) {
 	var issuedAt = time.Now().Unix()
 	var expiredAt = issuedAt + kTokenTimeout
 	var nToken = jwt.New(jwt.SigningMethodES256)
-	nToken.Header["kid"] = this.keyId
+	nToken.Header["kid"] = t.keyId
 	nToken.Claims = jwt.MapClaims{
-		"iss":   this.issuer,
+		"iss":   t.issuer,
 		"iat":   issuedAt,
 		"exp":   expiredAt,
 		"aud":   "appstoreconnect-v1",
 		"nonce": uuid.NewString(),
-		"bid":   this.bundleId,
+		"bid":   t.bundleId,
 	}
-	var bearer, err = nToken.SignedString(this.privateKey)
+	var bearer, err = nToken.SignedString(t.privateKey)
 	if err != nil {
 		return "", 0, err
 	}
 	return fmt.Sprintf("Bearer %s", bearer), issuedAt, nil
 }
 
-func (this *Token) Bearer() string {
-	this.Lock()
-	defer this.Unlock()
+func (t *Token) Bearer() string {
+	t.Lock()
+	defer t.Unlock()
 
-	if this.expired() {
-		this.bearer, this.issuedAt, _ = this.generate()
+	if t.expired() {
+		t.bearer, t.issuedAt, _ = t.generate()
 	}
-	return this.bearer
+	return t.bearer
 }
 
-func (this *Token) expired() bool {
-	return time.Now().Unix() >= (this.issuedAt + kTokenTimeout)
+func (t *Token) expired() bool {
+	return time.Now().Unix() >= (t.issuedAt + kTokenTimeout)
 }
