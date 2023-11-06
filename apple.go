@@ -93,7 +93,7 @@ func (c *Client) request(method, url string, param Param, body io.Reader, result
 
 	switch rsp.StatusCode {
 	case http.StatusOK:
-		return json.Unmarshal(data, &result)
+		return json.Unmarshal(data, result)
 	case http.StatusAccepted:
 		return nil
 	case http.StatusUnauthorized:
