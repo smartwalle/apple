@@ -21,7 +21,7 @@ var (
 // 首先请求苹果的服务器，获取票据(receipt)的详细信息，然后验证交易信息(transactionId)是否属于该票据，
 // 如果交易信息在票据中，则返回详细的交易信息。
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func VerifyReceipt(transactionId, receipt string, opts ...VerifyReceiptOptionFunc) (*ReceiptSummary, *InApp, error) {
+func VerifyReceipt(transactionId, receipt string, opts ...ReceiptOption) (*ReceiptSummary, *InApp, error) {
 	var summary, err = GetReceipt(receipt, opts...)
 	if err != nil {
 		return nil, nil, err
@@ -51,7 +51,7 @@ func VerifyReceipt(transactionId, receipt string, opts ...VerifyReceiptOptionFun
 // GetReceipt 获取票据信息
 //
 // 注意：本方法会先调用苹果生产环境接口进行票据查询，如果返回票据信息为测试环境中的信息时，则调用测试环境接口进行查询。
-func GetReceipt(receipt string, opts ...VerifyReceiptOptionFunc) (*ReceiptSummary, error) {
+func GetReceipt(receipt string, opts ...ReceiptOption) (*ReceiptSummary, error) {
 	var nOpt = &ReceiptOptions{}
 	nOpt.Client = http.DefaultClient
 	nOpt.Receipt = receipt

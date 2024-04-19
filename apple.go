@@ -17,6 +17,7 @@ const (
 	kStoreKitProduction = "https://api.storekit.itunes.apple.com/inApps"
 )
 
+// Client 苹果 App Store Server API
 type Client struct {
 	Client *http.Client
 	token  *storekit.Token

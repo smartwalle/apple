@@ -28,22 +28,23 @@ var (
 	ErrTokenExpired    = errors.New("token is expired")
 )
 
-type AuthOptionFunc func(c *AuthClient)
+type AuthClientOption func(c *AuthClient)
 
 // WithKeyExpiration 用于设置从 https://appleid.apple.com/auth/keys 获取的公钥在本地的缓存时间，单位为秒
-func WithKeyExpiration(expiration int64) AuthOptionFunc {
+func WithKeyExpiration(expiration int64) AuthClientOption {
 	return func(c *AuthClient) {
 		c.expiration = expiration
 	}
 }
 
 // WithBundleId 用于设置 VerifyToken() 方法需要的 BundleId 信息
-func WithBundleId(bundleId string) AuthOptionFunc {
+func WithBundleId(bundleId string) AuthClientOption {
 	return func(c *AuthClient) {
 		c.bundleId = bundleId
 	}
 }
 
+// AuthClient 苹果登录验证
 type AuthClient struct {
 	Client     *http.Client
 	keys       dbc.Cache[string, *rsa.PublicKey]
@@ -52,7 +53,7 @@ type AuthClient struct {
 	bundleId   string
 }
 
-func NewAuthClient(opts ...AuthOptionFunc) *AuthClient {
+func NewAuthClient(opts ...AuthClientOption) *AuthClient {
 	var nClient = &AuthClient{}
 	nClient.Client = http.DefaultClient
 	nClient.keys = dbc.New[*rsa.PublicKey]()

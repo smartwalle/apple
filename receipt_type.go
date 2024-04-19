@@ -18,9 +18,9 @@ type ReceiptOptions struct {
 	ExcludeOldTransactions bool         `json:"exclude-old-transactions"`
 }
 
-type VerifyReceiptOptionFunc func(opts *ReceiptOptions)
+type ReceiptOption func(opts *ReceiptOptions)
 
-func WithHTTPClient(client *http.Client) VerifyReceiptOptionFunc {
+func WithHTTPClient(client *http.Client) ReceiptOption {
 	return func(opts *ReceiptOptions) {
 		if client != nil {
 			opts.Client = client
@@ -28,13 +28,13 @@ func WithHTTPClient(client *http.Client) VerifyReceiptOptionFunc {
 	}
 }
 
-func WithPassword(password string) VerifyReceiptOptionFunc {
+func WithPassword(password string) ReceiptOption {
 	return func(opts *ReceiptOptions) {
 		opts.Password = password
 	}
 }
 
-func WithExcludeOldTransactions(value bool) VerifyReceiptOptionFunc {
+func WithExcludeOldTransactions(value bool) ReceiptOption {
 	return func(opts *ReceiptOptions) {
 		opts.ExcludeOldTransactions = value
 	}
