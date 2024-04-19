@@ -28,19 +28,19 @@ var (
 	ErrTokenExpired    = errors.New("token is expired")
 )
 
-type AuthOptionFunc func(opts *AuthClient)
+type AuthOptionFunc func(c *AuthClient)
 
 // WithKeyExpiration 用于设置从 https://appleid.apple.com/auth/keys 获取的公钥在本地的缓存时间，单位为秒
 func WithKeyExpiration(expiration int64) AuthOptionFunc {
-	return func(opts *AuthClient) {
-		opts.expiration = expiration
+	return func(c *AuthClient) {
+		c.expiration = expiration
 	}
 }
 
 // WithBundleId 用于设置 VerifyToken() 方法需要的 BundleId 信息
 func WithBundleId(bundleId string) AuthOptionFunc {
-	return func(opts *AuthClient) {
-		opts.bundleId = bundleId
+	return func(c *AuthClient) {
+		c.bundleId = bundleId
 	}
 }
 
