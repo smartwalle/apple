@@ -103,9 +103,10 @@ func (c *AuthClient) DecodeToken(token string) (*User, error) {
 	user.Issuer = claims.Issuer
 	user.BundleId = strings.Join(claims.Audience, ";")
 	user.Email = claims.Email
-	user.EmailVerified = claims.EmailVerified
-	user.IsPrivateEmail = claims.IsPrivateEmail
+	user.EmailVerified = bool(claims.EmailVerified)
+	user.IsPrivateEmail = bool(claims.IsPrivateEmail)
 	user.RealUserStatus = claims.RealUserStatus
+	user.TransferSub = claims.TransferSub
 	user.Nonce = claims.Nonce
 	user.AuthTime = int64(claims.AuthTime)
 	user.IssuedAt = claims.IssuedAt.Unix()

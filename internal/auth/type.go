@@ -7,15 +7,17 @@ type Header struct {
 	Alg string `json:"alg"`
 }
 
+type Bool bool
+
 type Claims struct {
 	jwt.RegisteredClaims
 	CHash          string `json:"c_hash"`
 	AuthTime       int    `json:"auth_time"`
 	Nonce          string `json:"nonce"`
-	NonceSupported bool   `json:"nonce_supported"`
+	NonceSupported Bool   `json:"nonce_supported"`
 	Email          string `json:"email"`
-	EmailVerified  string `json:"email_verified"`
-	IsPrivateEmail bool   `json:"is_private_email"`
+	EmailVerified  Bool   `json:"email_verified"`
+	IsPrivateEmail Bool   `json:"is_private_email"`
 	RealUserStatus int    `json:"real_user_status"`
 	TransferSub    string `json:"transfer_sub"`
 }
