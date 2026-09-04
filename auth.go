@@ -6,14 +6,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/smartwalle/apple/internal/auth"
 	"github.com/smartwalle/dbc"
 	"github.com/smartwalle/ngx"
-	"github.com/smartwalle/nsync/singleflight"
-	"net/http"
-	"strings"
-	"time"
+	"golang.org/x/sync/singleflight"
 )
 
 const (
@@ -48,7 +49,7 @@ func WithBundleId(bundleId string) AuthClientOption {
 type AuthClient struct {
 	Client     *http.Client
 	keys       dbc.Cache[string, *rsa.PublicKey]
-	group      singleflight.Group[string, interface{}]
+	group      singleflight.Group
 	expiration int64
 	bundleId   string
 }
@@ -57,7 +58,6 @@ func NewAuthClient(opts ...AuthClientOption) *AuthClient {
 	var nClient = &AuthClient{}
 	nClient.Client = http.DefaultClient
 	nClient.keys = dbc.New[*rsa.PublicKey]()
-	nClient.group = singleflight.New[interface{}]()
 	for _, opt := range opts {
 		if opt != nil {
 			opt(nClient)
@@ -144,7 +144,7 @@ func (c *AuthClient) GetAuthKey(kid string) *rsa.PublicKey {
 		return key
 	}
 
-	c.group.Do(kFetchAuthKeys, func(_ string) (interface{}, error) {
+	c.group.Do(kFetchAuthKeys, func() (interface{}, error) {
 		// 从苹果服务器请求 key 数据
 		var nKeys, _ = c.requestAuthKeys()
 

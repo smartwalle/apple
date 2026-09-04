@@ -8,7 +8,7 @@ require (
 	github.com/smartwalle/dbc v0.0.20
 	github.com/smartwalle/ncrypto v1.0.4
 	github.com/smartwalle/ngx v1.0.12
-	github.com/smartwalle/nsync v0.0.7
+	golang.org/x/sync v0.7.0
 )
 
 require github.com/smartwalle/queue v0.0.4 // indirect
