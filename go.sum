@@ -8,6 +8,8 @@ github.com/smartwalle/ncrypto v1.0.4 h1:P2rqQxDepJwgeO5ShoC+wGcK2wNJDmcdBOWAksuI
 github.com/smartwalle/ncrypto v1.0.4/go.mod h1:Dwlp6sfeNaPMnOxMNayMTacvC5JGEVln3CVdiVDgbBk=
 github.com/smartwalle/ngx v1.0.12 h1:jcoCyu/0HtQ1y/gbiSLzqOUZcHnVLlKOmm0awRF7Mcg=
 github.com/smartwalle/ngx v1.0.12/go.mod h1:mx/nz2Pk5j+RBs7t6u6k22MPiBG/8CtOMpCnALIG8Y0=
+github.com/smartwalle/ngx v1.1.2 h1:W+K262lHUvdfJ/2e762dIFwN543kxC/4qLkuCQLRS8o=
+github.com/smartwalle/ngx v1.1.2/go.mod h1:mx/nz2Pk5j+RBs7t6u6k22MPiBG/8CtOMpCnALIG8Y0=
 github.com/smartwalle/queue v0.0.4 h1:h2YfM/I1yjPOQjMkhPOVuN5cSk62fRPqzqhlyZ/5zDA=
 github.com/smartwalle/queue v0.0.4/go.mod h1:zMEHt/7zLtVwATDUQi3OdBUlbQ2XUzWd7OXP8p/684c=
 golang.org/x/sync v0.7.0 h1:YsImfSBoP9QPYL0xyKJPq0gcaJdG3rInoqxTWbfQu9M=
